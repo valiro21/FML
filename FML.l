@@ -2,21 +2,25 @@
 #include <stdio.h>
 #define MAX_LEVEL 101
 
+/**
+ * struct for the indent stack levels
+*/
 typedef struct indent_level_info {
 	char *str;
 	int len;
 };
 
-const char* ERROR;
-int FIRST_IN_BLOCK = 0;
-int NESTING = 0;
-int level = 0;
-char *line;
+const char* ERROR = NULL; /// error message to print
+int FIRST_IN_BLOCK = 0; /// 1 if the next line should be the start of a new block
+int NESTING = 0; /// 1 if nesing is present
+int level; /// current level of indentation
+char *line; /// pointer to the current line
 
 struct indent_level_info indent_stack[MAX_LEVEL];
 
 int assert_indent ();
 %}
+
  /* Identifier definitions go here such as */
 
 integer (0|-)?[1-9][0-9]*
@@ -95,9 +99,8 @@ unsigned int get_indent(char* line) {
 /// @return number of indentation characters
 int add_indent_level (char *line, int indent) {
 	FIRST_IN_BLOCK = 0;
-	level++;
 
-	if (level == MAX_LEVEL) {
+	if (level + 1 == MAX_LEVEL) {
 		return set_error ("Max depth reached!");
 	}
 
@@ -105,6 +108,7 @@ int add_indent_level (char *line, int indent) {
 	strncpy (indent_stack[level].str, line, indent);
 	indent_stack[level].str[indent] = 0;
 	indent_stack[level].len = indent;
+	level++;
 	return indent;
 }
 
