@@ -30,6 +30,15 @@ char '.|\n'
 string "(.|\n)+"
 identifier @[_a-zA-Z][_a-zA-Z0-9]*
 %%
+[ ]*\n       ;/* Ignore blank lines. */
+[ ]*[^ \n]+  { /** check identation and set current depth level */
+               	int indent = assert_indent(yytext);
+               	for (int i = yyleng - 1; i >= indent; i--){
+									unput (yytext[i]);
+				}
+			 }
+
+
 {integer} {return INT;}
 {real} {return REAL;}
 {char} {return CHAR;}
@@ -37,13 +46,6 @@ identifier @[_a-zA-Z][_a-zA-Z0-9]*
 {identifier} {return ID;}
 "int"|"float"|"char"|"string" {return TYPE;}
 
-[ ]*\n       ;/* Ignore blank lines. */
-[ ]*[^ \n]+  { /** check identation and set current depth level */
-               	int intend = assert_indent(yytext);
-               	for (int i = yyleng - 1; i >= intend; i--){
-									unput (yytext[i]);
-				}
-			 }
 %%
 
 /// set the error message to the given string
