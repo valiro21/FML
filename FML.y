@@ -5,7 +5,7 @@ extern char* yytext;
 extern int yylineno;
 %}
  /*token declarations go here */
-%token PLACEHOLDER
+%token INT REAL CHAR STRING ID TYPE
 %%
  test: PLACEHOLDER {}
  	 ;
