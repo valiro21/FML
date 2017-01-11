@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include "y.tab.h"
 #define MAX_LEVEL 101
 
 /**
@@ -23,21 +24,26 @@ int assert_indent ();
 
  /* Identifier definitions go here such as */
 
-integer (0|-)?[1-9][0-9]*
+integer (0|(-?[1-9][0-9]*))
 real -?[0-9]+[.][0-9]*
-char '.'
-string ".*"
-
+char '.|\n'
+string "(.|\n)+"
+identifier @[_a-zA-Z][_a-zA-Z0-9]*
 %%
-[ ]*\n       {/* Ignore blank lines. */}
-[ ]*[^ \n]+  { /** check intend and set current depth level */
-               	int intend = assert_indent(yytext);
-               	for (int i = yyleng - 1; i >= intend; i--) {
-									unput (yytext[i]);
-								}
-							}
 {integer} {return INT;}
-{real} {return DOUBLE;}
+{real} {return REAL;}
+{char} {return CHAR;}
+{string} {return STRING;}
+{identifier} {return ID;}
+"int"|"float"|"char"|"string" {return TYPE;}
+
+[ ]*\n       ;/* Ignore blank lines. */
+[ ]*[^ \n]+  { /** check identation and set current depth level */
+               	int intend = assert_indent(yytext);
+               	for (int i = yyleng - 1; i >= intend; i--){
+									unput (yytext[i]);
+				}
+			 }
 %%
 
 /// set the error message to the given string
