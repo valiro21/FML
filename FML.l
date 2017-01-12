@@ -24,19 +24,32 @@ int assert_indent ();
 
  /* Identifier definitions go here such as */
 
-integer (0|(-?[1-9][0-9]*))
-real -?[0-9]+[.][0-9]*
+real -?[0-9]+(\.[0-9]*)?([eE]-?[0-9]+)?
+integer -?[0-9]+
 char '.|\n'
 string "(.|\n)+"
-identifier @[_a-zA-Z][_a-zA-Z0-9]*
+identifier @[_a-zA-Z][_a-zA-Z0-9]*\??
+
 %%
-[ ]*\n       ;/* Ignore blank lines. */
-[ ]*[^ \n]+  { /** check identation and set current depth level */
+
+ /* ===============================================================
+  *
+  *                       INDENT REGEX AND BLANK LINE              */
+ 
+[ |\t]*\n       ;/* Ignore blank lines. */
+[^\n]+:[^ \t]+\n  { /** check is the requirements for starting a new block are met - comma followed only by whitespaces, tabs and a single newline */
+										FIRST_IN_BLOCK = 1; REJECT;}
+[ |\t]*[^\n]+  { /** check identation and set current depth level */
                	int indent = assert_indent(yytext);
+								if (indent == -1) {
+									yyerror 
+								}
                	for (int i = yyleng - 1; i >= indent; i--){
 									unput (yytext[i]);
-				}
-			 }
+								}
+			 				}
+ /* =============================================================== */
+
 
 
 {integer} {return INT;}
@@ -51,9 +64,9 @@ identifier @[_a-zA-Z][_a-zA-Z0-9]*
 /// set the error message to the given string
 /// @param error: error message string to be displayed
 /// @return -1
-int set_error (const char *error) {
-	ERROR = error;
-	return -1;
+void yyerror (const char *error) {
+	fprintf (stderr, "%s\n", error);
+	exit (-1);
 }
 
 
@@ -109,7 +122,7 @@ int add_indent_level (char *line, int indent) {
 	FIRST_IN_BLOCK = 0;
 
 	if (level + 1 == MAX_LEVEL) {
-		return set_error ("Max depth reached!");
+		yyerror ("Max depth reached!");
 	}
 
 	indent_stack[level].str = (char *) malloc (indent + 1);
@@ -146,15 +159,15 @@ int assert_indent(char* line) {
 					return add_indent_level (line, indent);
 				}
 				else {
-					return set_error ("TabError: inconsistent use of tabs and spaces in indentation");
+					yyerror ("TabError: inconsistent use of tabs and spaces in indentation");
 				}
 			}
 			else {
-					return set_error ("IndentationError: expected new indentation block");
+					yyerror ("IndentationError: expected new indentation block");
 			}
 	}
 	else if (indent > indent_stack[level].len) {
-		return set_error ("IndentationError: unexpected indent");
+		yyerror ("IndentationError: unexpected indent");
 	}
 	else {
 		while (indent < indent_stack[level].len && strncpy (line, indent_stack[level].str, indent) == 0) {
@@ -164,7 +177,7 @@ int assert_indent(char* line) {
 		
 		// check if indentation is exactly as the current level
 		if (!(indent == indent_stack[level].len && strncpy (line, indent_stack[level].str, indent) == 0)) {
-			return set_error ("TabError: inconsistent use of tabs and spaces in indentation");
+			yyerror ("TabError: inconsistent use of tabs and spaces in indentation");
 		}	
 	}
 
