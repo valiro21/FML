@@ -28,7 +28,7 @@ real -?[0-9]+(\.[0-9]*)?([eE]-?[0-9]+)?
 integer -?[0-9]+
 char '.|\n'
 string "(.|\n)+"
-identifier @[_a-zA-Z][_a-zA-Z0-9]*\??
+identifier [_a-zA-Z][_a-zA-Z0-9]*\??
 
 %%
 
@@ -42,7 +42,7 @@ identifier @[_a-zA-Z][_a-zA-Z0-9]*\??
 [ |\t]*[^\n]+  { /** check identation and set current depth level */
                	int indent = assert_indent(yytext);
 								if (indent == -1) {
-									yyerror 
+									yyerror();
 								}
                	for (int i = yyleng - 1; i >= indent; i--){
 									unput (yytext[i]);
@@ -58,18 +58,14 @@ identifier @[_a-zA-Z][_a-zA-Z0-9]*\??
 {string} {return STRING;}
 {identifier} {return ID;}
 "int"|"float"|"char"|"string" {return TYPE;}
+"=" {return ASSIGN;}
+
 
 %%
 
 /// set the error message to the given string
 /// @param error: error message string to be displayed
 /// @return -1
-void yyerror (const char *error) {
-	fprintf (stderr, "%s\n", error);
-	exit (-1);
-}
-
-
 
 /* ===============================================================
  *
@@ -182,12 +178,4 @@ int assert_indent(char* line) {
 	}
 
 	return indent;
-}
-
-
-/* custom main definition */
-int main(int argc, char* argv[]) {
-  add_indent_level ("\0", 0);
-  yylex();
-  printf("\n") ;
 }

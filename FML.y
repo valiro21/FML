@@ -46,6 +46,10 @@ call_params : EXPR
  /*action definitions go here */
 %%
  /*custom main functions and such go here*/
+int yyerror(char * s){
+	printf("error: %s at line: %d\n",s,yylineno);
+}
+
 int main(int argc, char** argv){
 	yyin = fopen(argv[1],"r");
 	yyparse();
