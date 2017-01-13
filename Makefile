@@ -1,5 +1,5 @@
-a.out: lex.yy.c y.tab.h y.tab.c
-	gcc FML.tab.c lex.yy.c -ll -ly
+a.out: lex.yy.c y.tab.h y.tab.c types.c types.h
+	gcc types.c FML.tab.c lex.yy.c -ll -ly
 
 lex.yy.c: FML.l
 	lex FML.l
