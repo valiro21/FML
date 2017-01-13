@@ -1,11 +1,19 @@
 %{
 #include <stdio.h>
+#include "types.h"
 extern FILE* yyin;
 extern char* yytext;
 extern int yylineno;
 %}
  /*token declarations go here */
-%token INT REAL CHAR STRING ID TYPE BGN ASSIGN EXPR END FOR WHILE IF BOOL OR AND
+
+%union {
+	struct var_value value;
+}
+
+%type <value> expr term factor
+%token <value> REAL INT CHAR
+%token STRING ID TYPE BGN ASSIGN EXPR END FOR WHILE IF BOOL OR AND
 %start program
 %%
 program: instructions {printf("Works\n");}
@@ -23,12 +31,8 @@ instruction : declaration {printf("Rule instruction -> declaration\n");}
 			| assignment {printf("Rule instruction ->assignment\n");}
 			;
 
-assignment : ID ASSIGN INT {printf("Rule assignment -> ID ASSIGN INT\n");}
-		   | ID ASSIGN REAL {printf("Rule assignment -> ID ASSIGN REAL\n");}
-		   | ID ASSIGN CHAR {printf("Rule assignment -> ID ASSIGN CHAR\n");}
-		   | ID ASSIGN STRING {printf("Rule assignment -> ID ASSIGN STRING\n");}
-		   | ID ASSIGN ID
-		   ;
+assignment : ID ASSIGN expr {printf("Rule assignment -> ID ASSIGN expr\n");}
+		   		 ;
 
 declaration : TYPE ID {printf("Rule declaration -> TYPE ID\n");}
 			| TYPE ID '(' parameters ')'
@@ -84,6 +88,22 @@ call_params : EXPR
 			| call_params ',' EXPR
 			;
 
+expr : expr '+' term          {SOLVE($$,$1,$3,+)}
+     | expr '-' term          {SOLVE($$,$1,$3,-)}
+     | term                   {ASSIGN($$,$1)}
+     ;
+
+term : term '*' factor     {SOLVE($$,$1,$3,*)}
+     | expr '/' term       {SOLVE($$,$1,$3,/)}
+     | factor              {ASSIGN($$,$1)}
+     ;
+
+factor : '(' expr ')'        {ASSIGN($$,$2)}
+       | '-' factor          {struct var_value minus_one; minus_one.TYPE_INT_VAL = -1; minus_one.type = TYPE_INT;
+                              SOLVE($$,minus_one, $2, *)}
+       | REAL                 {$1.type = TYPE_FLOAT; ASSIGN($$,$1)}
+       | INT                 {$1.type = TYPE_INT; ASSIGN($$,$1)}
+       ;
  /*action definitions go here */
 %%
  /*custom main functions and such go here*/
