@@ -1,12 +1,15 @@
-
 a.out: lex.yy.c y.tab.h y.tab.c
-	gcc y.tab.h y.tab.c lex.yy.c -ll -ly
+	gcc FML.tab.c lex.yy.c -ll -ly
 
 lex.yy.c: FML.l
-	flex FML.l
+	lex FML.l
 
 y.tab.h: FML.y
-	yacc -d FML.y
+	bison -d FML.y
 
 y.tab.c:  FML.y
-	yacc FML.y
+	bison FML.y
+
+clean:
+	rm -rf a.out lex.yy.c FML.tab.h FML.tab.c FML.tab.h.gch
+
