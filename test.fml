@@ -1,0 +1,14 @@
+int a
+char b
+float c
+a=1
+
+
+
+for i 1,0,1 : {
+a=1
+}
+if a or 1 or 3 : a=1
+while a: {
+kek = x
+}
