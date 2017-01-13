@@ -8,14 +8,14 @@ extern int yylineno;
 %token INT REAL CHAR STRING ID TYPE BGN ASSIGN EXPR END
 %start program
 %%
-program: declarations block {printf("Works\n");}
+program: declarations {printf("Works\n");}
        ;
 
-declarations : declaration ';'
-			 | declarations declaration ';'
+declarations : declaration '\n' {printf("Rule declarations -> declaration\n");}
+			 | declarations declaration '\n' {printf("Rule declarations -> declarations declaration\n");}
 			 ;
 
-declaration : TYPE ID
+declaration : TYPE ID {printf("Rule declaration -> TYPE ID\n");}
 			| TYPE ID '(' parameters ')'
 			| TYPE ID '(' ')'
 			;
@@ -34,9 +34,9 @@ list : statement '\n'
 	 | list statement '\n'
 	 ;
 
-statement : ID ASSIGN ID
-		  | ID ASSIGN EXPR
-		  | ID '(' call_params ')'
+statement : ID ASSIGN ID '\n'
+		  | ID ASSIGN EXPR '\n'
+		  | ID '(' call_params ')' '\n'
 		  ;
 
 call_params : EXPR
