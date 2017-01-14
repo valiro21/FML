@@ -11,7 +11,7 @@ extern int yylineno;
 	struct var_value value;
 }
 
-%type <value> expr term factor
+%type <value> expr no_op2 no_op3 no_op4 factor
 %token <value> REAL INT CHAR
 %token STRING ID TYPE BGN ASSIGN EXPR END FOR WHILE IF BOOL OR AND
 %start program
@@ -37,6 +37,7 @@ assignment : ID ASSIGN expr {printf("Rule assignment -> ID ASSIGN expr\n");}
 declaration : TYPE ID {printf("Rule declaration -> TYPE ID\n");}
 			| TYPE ID '(' parameters ')'
 			| TYPE ID '(' ')'
+			| TYPE ID ASSIGN expr
 			;
 
 vartype : INT
@@ -88,15 +89,23 @@ call_params : EXPR
 			| call_params ',' EXPR
 			;
 
-expr : expr '+' term          {SOLVE($$,$1,$3,+)}
-     | expr '-' term          {SOLVE($$,$1,$3,-)}
-     | term                   {ASSIGN($$,$1)}
+expr : no_op2 '+' no_op2          {SOLVE($$,$1,$3,+)}
+     | no_op2 '-' no_op2          {SOLVE($$,$1,$3,-)}
+     | no_op2                     {ASSIGN($$,$1)}
      ;
 
-term : term '*' factor     {SOLVE($$,$1,$3,*)}
-     | expr '/' term       {SOLVE($$,$1,$3,/)}
-     | factor              {ASSIGN($$,$1)}
-     ;
+no_op2 : no_op3 '*' no_op3     {SOLVE($$,$1,$3,*)}
+       | no_op3 '/' no_op3     {SOLVE($$,$1,$3,/)}
+       | no_op3                {ASSIGN($$,$1)}
+       ;
+
+no_op3 : no_op4 OR no_op4     {SOLVE_CAST($$,$1,$3,|)}
+       | no_op4               {ASSIGN($$,$1)}
+       ;
+
+no_op4 : factor AND factor    {SOLVE_CAST($$,$1,$3,&)}
+       | factor               {ASSIGN($$,$1)}
+       ;
 
 factor : '(' expr ')'        {ASSIGN($$,$2)}
        | '-' factor          {struct var_value minus_one; minus_one.TYPE_INT_VAL = -1; minus_one.type = TYPE_INT;
@@ -104,6 +113,7 @@ factor : '(' expr ')'        {ASSIGN($$,$2)}
        | REAL                 {$1.type = TYPE_FLOAT; ASSIGN($$,$1)}
        | INT                 {$1.type = TYPE_INT; ASSIGN($$,$1)}
        ;
+
  /*action definitions go here */
 %%
  /*custom main functions and such go here*/
