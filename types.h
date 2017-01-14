@@ -15,6 +15,8 @@ typedef struct var_value {
 } var_value;
 
 #define FIELD(var,type) var.type##_VAL
+#define FIELD_CAST(var,type,type_cast) *((typeof(FIELD(var,type_cast)) *) &var.type##_VAL)
+#define FIELD_CAST_INT(var,type) *((int *) &var.type##_VAL)
 
 #define CAST(r,t1,t1type,t2,t2type,op) if (t2.type == t2type) {if(t1type <= t2type) { \
 																						r.type=t2type; \
@@ -23,6 +25,17 @@ typedef struct var_value {
                                         else { \
 																						r.type =t1type; \
                                             FIELD(r, t1type) = FIELD(t1,t1type) op FIELD(t2,t2type); \
+                                        } }
+
+#define CAST_CAST(r,t1,t1type,t2,t2type,op) if (t2.type == t2type) {if(t1type <= t2type) { \
+																						r.type=t2type; \
+                                            int x = FIELD_CAST_INT(t1,t1type) op FIELD_CAST_INT(t2,t2type); \
+																						FIELD(r,t2type) = *((typeof(FIELD(r,t2type)) *) &x); \
+																				} \
+                                        else { \
+																						r.type =t1type; \
+                                            int x = FIELD_CAST_INT(t1,t1type) op FIELD_CAST_INT(t2,t2type); \
+																						FIELD(r,t1type) = *((typeof(FIELD(r,t1type)) *) &x); \
                                         } }
 
 
@@ -45,6 +58,23 @@ extern char SVAR;
                             SET (r, t1, TYPE_FLOAT, t2, op) \
                             SET (r, t1, TYPE_LONGLONG, t2, op) \
                             SET (r, t1, TYPE_DOUBLE, t2, op) \
+
+#define SET_CAST(r,t1,TYPE,t2,op) if (t1.type == TYPE) { \
+                            CAST_CAST (r,t1,TYPE,t2, TYPE_BOOL, op) \
+                            CAST_CAST (r,t1,TYPE,t2, TYPE_CHAR, op) \
+                            CAST_CAST (r,t1,TYPE,t2, TYPE_INT, op) \
+                            CAST_CAST (r,t1,TYPE,t2, TYPE_FLOAT, op) \
+                            CAST_CAST (r,t1,TYPE,t2, TYPE_LONGLONG, op) \
+                            CAST_CAST (r,t1,TYPE,t2, TYPE_DOUBLE, op) \
+                            }
+
+#define SOLVE_CAST(r,t1,t2,op)  SETVARS \
+                            SET_CAST (r, t1, TYPE_BOOL, t2, op) \
+                            SET_CAST (r, t1, TYPE_CHAR, t2, op) \
+                            SET_CAST (r, t1, TYPE_INT, t2, op) \
+                            SET_CAST (r, t1, TYPE_FLOAT, t2, op) \
+                            SET_CAST (r, t1, TYPE_LONGLONG, t2, op) \
+                            SET_CAST (r, t1, TYPE_DOUBLE, t2, op) \
 
 #define TYPE_ASSIGN(r,t1,TYPE) if(TYPE == t1.type) { \
 																	FIELD(r,TYPE) = FIELD(t1,TYPE); \
