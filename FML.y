@@ -89,29 +89,29 @@ call_params : EXPR
 			| call_params ',' EXPR
 			;
 
-expr : no_op2 '+' no_op2          {SOLVE($$,$1,$3,+)}
-     | no_op2 '-' no_op2          {SOLVE($$,$1,$3,-)}
-     | no_op2                     {ASSIGN($$,$1)}
+expr : no_op2 '+' no_op2          {SOLVE($$,$1,$3,+);}
+     | no_op2 '-' no_op2          {SOLVE($$,$1,$3,-);}
+     | no_op2                     {ASSIGN($$,$1);}
      ;
 
-no_op2 : no_op3 '*' no_op3     {SOLVE($$,$1,$3,*)}
-       | no_op3 '/' no_op3     {SOLVE($$,$1,$3,/)}
-       | no_op3                {ASSIGN($$,$1)}
+no_op2 : no_op3 '*' no_op3     {SOLVE($$,$1,$3,*);}
+       | no_op3 '/' no_op3     {SOLVE($$,$1,$3,/);}
+       | no_op3                {ASSIGN($$,$1);}
        ;
 
-no_op3 : no_op4 OR no_op4     {SOLVE_CAST($$,$1,$3,|)}
-       | no_op4               {ASSIGN($$,$1)}
+no_op3 : no_op4 OR no_op4     {SOLVE_CAST($$,$1,$3,|);}
+       | no_op4               {ASSIGN($$,$1);}
        ;
 
-no_op4 : factor AND factor    {SOLVE_CAST($$,$1,$3,&)}
-       | factor               {ASSIGN($$,$1)}
+no_op4 : factor AND factor    {SOLVE_CAST($$,$1,$3,&);}
+       | factor               {ASSIGN($$,$1);}
        ;
 
-factor : '(' expr ')'        {ASSIGN($$,$2)}
+factor : '(' expr ')'        {ASSIGN($$,$2);}
        | '-' factor          {struct var_value minus_one; minus_one.TYPE_INT_VAL = -1; minus_one.type = TYPE_INT;
-                              SOLVE($$,minus_one, $2, *)}
-       | REAL                 {$1.type = TYPE_FLOAT; ASSIGN($$,$1)}
-       | INT                 {$1.type = TYPE_INT; ASSIGN($$,$1)}
+                              SOLVE($$,minus_one, $2, *);}
+       | REAL                 {$1.type = TYPE_FLOAT; ASSIGN($$,$1);}
+       | INT                 {$1.type = TYPE_INT; ASSIGN($$,$1);}
        ;
 
  /*action definitions go here */
