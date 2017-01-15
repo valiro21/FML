@@ -112,6 +112,7 @@ factor : '(' expr ')'        {ASSIGN($$,$2);}
                               SOLVE($$,minus_one, $2, *);}
        | REAL                 {$1.type = TYPE_FLOAT; ASSIGN($$,$1);}
        | INT                 {$1.type = TYPE_INT; ASSIGN($$,$1);}
+			 | ID								
        ;
 
  /*action definitions go here */
