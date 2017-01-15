@@ -21,7 +21,7 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 "double" {yylval.type = 5; return TYPE;}
 "longlong" {yylval.type = 4; return TYPE;}
 "bool" {yylval.type = 0; return TYPE;}
-"true"|"false" {yylval.value.type = 0; yylval.value.TYPE_BOOL_VAL = 1; return BOOL;}
+"true" {yylval.value.type = 0; yylval.value.TYPE_BOOL_VAL = 1; return BOOL;}
 "false" {yylval.value.type = 0; yylval.value.TYPE_BOOL_VAL = 0; return BOOL;}
 "for" {return FOR;}
 "while" {return WHILE;}
@@ -29,6 +29,7 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 "or" {return OR;}
 "and" {return AND;}
 "auto" {return AUTO;}
+"printf" {return PRINT;}
 {identifier} {yylval.varname = (char *)malloc (yyleng+1); strcpy (yylval.varname, yytext); return ID;}
 {integer} {yylval.value.TYPE_INT_VAL=atoi(yytext);return INT;}
 {real} {yylval.value.TYPE_FLOAT_VAL=atof(yytext);return REAL;}

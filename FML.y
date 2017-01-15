@@ -25,7 +25,7 @@ struct trie *variables;
 %token <value> BOOL
 %type <value> expr no_op2 no_op3 no_op4 factor
 %token <value> REAL INT CHAR
-%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO
+%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO PRINT
 %start program
 %%
 program: instructions {printf("Works\n");}
@@ -41,17 +41,22 @@ instruction : declaration {printf("Rule instruction -> declaration\n");}
 			| functionCall {printf("Rule instruction -> functionCall\n");}
 			| for {printf("Rule instruction -> for\n");}
 			| assignment {printf("Rule instruction ->assignment\n");}
+			| print
 			;
 
+print : PRINT '(' expr ')' {
+	  	PRINT($3);
+	  }
+
 assignment : ID ASSIGN expr {struct var_value *var = set(variables, $1, $3);
-															if(var == NULL) {
-																char *error = malloc (256);
-																strcpy (error, "Variable ");
-																strcat (error, $1);
-																strcat (error, " is not declarated");
-																yyerror (error);
-															}
-															printf("Rule assignment -> ID ASSIGN expr\n");}
+	if(var == NULL) {
+		char *error = malloc (256);
+		strcpy (error, "Variable ");
+		strcat (error, $1);
+		strcat (error, " is not declarated");
+		yyerror (error);
+	}
+	printf("Rule assignment -> ID ASSIGN expr\n");}
 		   		 ;
 
 declaration : TYPE ID { if (create(variables, $2, $1) == -1) {
