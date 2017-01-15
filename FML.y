@@ -1,19 +1,31 @@
 %{
 #include <stdio.h>
+#include <string.h>
 #include "types.h"
+#include "trie.h"
+
 extern FILE* yyin;
 extern char* yytext;
 extern int yylineno;
+extern int yyerror(char *);
+extern int yylex(void);
+
+struct trie *variables;
 %}
  /*token declarations go here */
 
 %union {
 	struct var_value value;
+	int type;
+	char* varname;
 }
 
+%token <type> TYPE
+%token <varname> ID
+%token <value> BOOL
 %type <value> expr no_op2 no_op3 no_op4 factor
 %token <value> REAL INT CHAR
-%token STRING ID TYPE BGN ASSIGN EXPR END FOR WHILE IF BOOL OR AND
+%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND
 %start program
 %%
 program: instructions {printf("Works\n");}
@@ -34,7 +46,8 @@ instruction : declaration {printf("Rule instruction -> declaration\n");}
 assignment : ID ASSIGN expr {printf("Rule assignment -> ID ASSIGN expr\n");}
 		   		 ;
 
-declaration : TYPE ID {printf("Rule declaration -> TYPE ID\n");}
+declaration : TYPE ID { create(variables, $2, $1);
+												printf("Rule declaration -> TYPE ID\n");}
 			| TYPE ID '(' parameters ')'
 			| TYPE ID '(' ')'
 			| TYPE ID ASSIGN expr
@@ -110,19 +123,36 @@ no_op4 : factor AND factor    {SOLVE_CAST($$,$1,$3,&);}
 factor : '(' expr ')'        {ASSIGN($$,$2);}
        | '-' factor          {struct var_value minus_one; minus_one.TYPE_INT_VAL = -1; minus_one.type = TYPE_INT;
                               SOLVE($$,minus_one, $2, *);}
-       | REAL                 {$1.type = TYPE_FLOAT; ASSIGN($$,$1);}
+       | REAL                {$1.type = TYPE_FLOAT; ASSIGN($$,$1);}
        | INT                 {$1.type = TYPE_INT; ASSIGN($$,$1);}
-			 | ID								
+			 | ID								   {printf ("GREGSFDGFDSGFDSGDSFFDSGSD\n");
+															struct var_value *var = get(variables, $1);
+															if(var == NULL) {
+																char *error = malloc (256);
+																strcpy (error, "Variable ");
+																strcat (error, $1);
+																strcat (error, " is not declarated");
+																yyerror (error);
+															}
+															
+															PRINT ((*var));
+															printf ("\n");
+															$$ = *var;
+														 }
+															
        ;
 
  /*action definitions go here */
 %%
+
  /*custom main functions and such go here*/
 int yyerror(char * s){
-	printf("error: %s at line: %d\n",s,yylineno);
+	fprintf(stderr, "error: %s at line: %d\n",s,yylineno);
+	exit (1);
 }
 
 int main(int argc, char** argv){
 	yyin = fopen(argv[1],"r");
+	variables = Trie ();
 	yyparse();
 }

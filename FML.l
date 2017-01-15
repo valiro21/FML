@@ -14,15 +14,21 @@ string "(.|\n)+"
 identifier [_a-zA-Z][_a-zA-Z0-9]*
 
 %%
-
-"int"|"float"|"string"|"char"|"double" {return TYPE;}
-"true"|"false" {return BOOL;}
+"int" {yylval.type = 2; return TYPE;}
+"float" {yylval.type = 3; return TYPE;}
+"string" {yylval.type = 6; return TYPE;}
+"char" {yylval.type = 1; return TYPE;}
+"double" {yylval.type = 5; return TYPE;}
+"longlong" {yylval.type = 4; return TYPE;}
+"bool" {yylval.type = 0; return TYPE;}
+"true"|"false" {yylval.value.type = 0; yylval.value.TYPE_BOOL_VAL = 1; return BOOL;}
+"false" {yylval.value.type = 0; yylval.value.TYPE_BOOL_VAL = 0; return BOOL;}
 "for" {return FOR;}
 "while" {return WHILE;}
 "if" {return IF;}
 "or" {return OR;}
 "and" {return AND;}
-{identifier} {return ID;}
+{identifier} {yylval.varname = (char *)malloc (yyleng+1); strcpy (yylval.varname, yytext); return ID;}
 {integer} {yylval.value.TYPE_INT_VAL=atoi(yytext);return INT;}
 {real} {yylval.value.TYPE_FLOAT_VAL=atof(yytext);return REAL;}
 {char} {yylval.value.TYPE_CHAR_VAL=yytext[1];return CHAR;}
