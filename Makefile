@@ -2,7 +2,7 @@ INCLUDE_DIR=./src
 TEST_FILES=$(wildcard test/*.fml)
 
 a.out: lex.yy.c y.tab.h y.tab.c src/types.c src/types.h
-	gcc src/types.c FML.tab.c lex.yy.c -ll -ly -I${INCLUDE_DIR}
+	gcc -std=c99 src/types.c src/trie.c FML.tab.c lex.yy.c -ll -ly -I${INCLUDE_DIR}
 
 lex.yy.c: FML.l
 	lex FML.l
