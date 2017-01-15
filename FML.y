@@ -5,6 +5,7 @@
 #include "trie.h"
 
 extern FILE* yyin;
+FILE * log;
 extern char* yytext;
 extern int yylineno;
 extern int yyerror(char *);
@@ -28,19 +29,20 @@ struct trie *variables;
 %token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO PRINT
 %start program
 %%
-program: instructions {printf("Works\n");}
+program: instructions {fprintf(log,"Works\n");}
        ;
 
-instructions: instruction '\n' {printf("Rule instructions -> instruction\n");}
-			| instructions instruction '\n' {printf("Rule instructions -> instructions instruction\n");}
+instructions: instruction '\n' {fprintf(log,"Rule instructions -> instruction\n");}
+			| instructions instruction '\n' {fprintf(log,"Rule instructions -> instructions instruction\n");}
 			;
 
-instruction : declaration {printf("Rule instruction -> declaration\n");}
-			| if {printf("Rule instruction -> if\n");}
-			| while {printf("Rule instruction -> while\n");}
-			| functionCall {printf("Rule instruction -> functionCall\n");}
-			| for {printf("Rule instruction -> for\n");}
-			| assignment {printf("Rule instruction ->assignment\n");}
+instruction : declaration {fprintf(log,"Rule instruction -> declaration\n");}
+			| if {fprintf(log,"Rule instruction -> if\n");}
+			| while {fprintf(log,"Rule instruction -> while\n");}
+			| functionCall {fprintf(log,"Rule instruction -> functionCall\n");}
+			| for {fprintf(log,"Rule instruction -> for\n");}
+			| assignment {fprintf(log,"Rule instruction ->assignment\n");}
+			| print
 			;
 
 print : PRINT '(' expr ')' {
@@ -64,7 +66,7 @@ declaration : TYPE ID { if (create(variables, $2, $1) == -1) {
 													strcat (error, $2);
 													yyerror (error);
 												}
-												printf("Rule declaration -> TYPE ID\n");}
+												fprintf(log,"Rule declaration -> TYPE ID\n");}
 			| TYPE ID '(' parameters ')'
 			| TYPE ID '(' ')'
 			| TYPE ID ASSIGN expr { if (create(variables, $2, $1) == -1) {
@@ -73,7 +75,7 @@ declaration : TYPE ID { if (create(variables, $2, $1) == -1) {
 																strcat (error, $2);
 																yyerror (error);
 															}
-															printf("Rule declaration -> TYPE ID\n");
+															fprintf(log,"Rule declaration -> TYPE ID\n");
 															struct var_value *var = get(variables, $2);
 															ASSIGN_CAST((*var), $4);	
 														}
@@ -84,7 +86,7 @@ declaration : TYPE ID { if (create(variables, $2, $1) == -1) {
 														strcat (error, $2);
 														yyerror (error);
 													}
-													printf("Rule declaration -> TYPE ID\n");
+													fprintf(log,"Rule declaration -> TYPE ID\n");
 												
 													struct var_value *var = get(variables, $2);
 													ASSIGN_CAST((*var), $4);
@@ -127,9 +129,9 @@ while : WHILE boolExpr ':' assignment
 	  | WHILE boolExpr ':' BGN '\n' instructions END
 	  ;
 
-for : FOR ID INT ',' INT ',' INT ':' assignment {printf("Rule for\n");}
-	| FOR ID INT ',' INT ',' INT ':' functionCall {printf("Rule for\n");}
-	| FOR ID INT ',' INT ',' INT ':' BGN '\n'instructions END {printf("Rule for\n");}
+for : FOR ID INT ',' INT ',' INT ':' assignment {fprintf(log,"Rule for\n");}
+	| FOR ID INT ',' INT ',' INT ':' functionCall {fprintf(log,"Rule for\n");}
+	| FOR ID INT ',' INT ',' INT ':' BGN '\n'instructions END {fprintf(log,"Rule for\n");}
 	;
 
 call_params : EXPR
@@ -188,6 +190,7 @@ int yyerror(char * s){
 }
 
 int main(int argc, char** argv){
+	log = fopen("log.txt","w");
 	yyin = fopen(argv[1],"r");
 	variables = Trie ();
 	yyparse();
