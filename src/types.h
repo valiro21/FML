@@ -15,7 +15,7 @@ typedef struct var_value {
 } var_value;
 
 #define FIELD(var,type) var.type##_VAL
-#define FIELD_CAST(var,type,type_cast) *((typeof(FIELD(var,type_cast)) *) &var.type##_VAL)
+#define FIELD_CAST(var,type,type_cast) (__typeof__(FIELD(var,type))) FIELD(var,type)
 #define FIELD_CAST_INT(var,type) *((int *) &var.type##_VAL)
 
 #define CAST(r,t1,t1type,t2,t2type,op) if (t2.type == t2type) {if(t1type <= t2type) { \
@@ -81,6 +81,7 @@ extern char SVAR;
 																	r.type=TYPE; \
 																}
 
+
 #define ASSIGN(r,t1)  SETVARS \
                       TYPE_ASSIGN(r,t1,TYPE_BOOL) \
                       TYPE_ASSIGN(r,t1,TYPE_CHAR) \
@@ -88,6 +89,25 @@ extern char SVAR;
                       TYPE_ASSIGN(r,t1,TYPE_FLOAT) \
                       TYPE_ASSIGN(r,t1,TYPE_LONGLONG) \
                       TYPE_ASSIGN(r,t1,TYPE_DOUBLE)
+
+#define TYPE_ASSIGN_CAST_ALL(r,rtype,t1,t1type) if (r.type == rtype && t1.type == t1type) {\
+																												FIELD(r,rtype) = FIELD_CAST(t1,t1type,rtype); \
+																											}
+																
+#define TYPE_ASSIGN_CAST(r,t1,TYPE) TYPE_ASSIGN_CAST_ALL(r,TYPE_BOOL,t1,TYPE) \
+																		TYPE_ASSIGN_CAST_ALL(r,TYPE_CHAR,t1,TYPE) \
+															 			TYPE_ASSIGN_CAST_ALL(r,TYPE_INT,t1,TYPE) \
+															 			TYPE_ASSIGN_CAST_ALL(r,TYPE_FLOAT,t1,TYPE) \
+															 			TYPE_ASSIGN_CAST_ALL(r,TYPE_LONGLONG,t1,TYPE) \
+															 			TYPE_ASSIGN_CAST_ALL(r,TYPE_DOUBLE,t1,TYPE)
+
+#define ASSIGN_CAST(r,t1)  SETVARS \
+                      TYPE_ASSIGN_CAST(r,t1,TYPE_BOOL) \
+                      TYPE_ASSIGN_CAST(r,t1,TYPE_CHAR) \
+                      TYPE_ASSIGN_CAST(r,t1,TYPE_INT) \
+                      TYPE_ASSIGN_CAST(r,t1,TYPE_FLOAT) \
+                      TYPE_ASSIGN_CAST(r,t1,TYPE_LONGLONG) \
+                      TYPE_ASSIGN_CAST(r,t1,TYPE_DOUBLE)
 
 const char * format_TYPE_BOOL;
 const char * format_TYPE_CHAR;
