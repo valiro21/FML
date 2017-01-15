@@ -19,12 +19,13 @@ int main () {
         struct var_value *res1 = get(t, "x");
         struct var_value *res2 = get(t, "xa");
         struct var_value *res3 = get(t, "a");
-        
+        struct var_value *res4 = get(t, "ba");
+				        
         PRINT ((*res1)); printf (" ");
         PRINT ((*res2)); printf (" ");
         PRINT ((*res3));
         
-        if (res1 == NULL || res2 == NULL || res3 == NULL) {
+        if (res1 == NULL || res2 == NULL || res3 == NULL || res4 != NULL) {
 		printf ("Test failed!\n");
 		return 1;
 	}	
