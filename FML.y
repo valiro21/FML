@@ -41,7 +41,6 @@ instruction : declaration {printf("Rule instruction -> declaration\n");}
 			| functionCall {printf("Rule instruction -> functionCall\n");}
 			| for {printf("Rule instruction -> for\n");}
 			| assignment {printf("Rule instruction ->assignment\n");}
-			| print
 			;
 
 print : PRINT '(' expr ')' {
@@ -174,9 +173,7 @@ factor : '(' expr ')'        {ASSIGN($$,$2);}
 																yyerror (error);
 															}
 															
-															PRINT ((*var));
-															printf ("\n");
-															$$ = *var;
+															ASSIGN($$,(*var));
 														 }
 															
        ;
