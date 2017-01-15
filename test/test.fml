@@ -1,6 +1,7 @@
 int a
 char b
 float c
+int x
 a=1
 
 
