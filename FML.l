@@ -28,6 +28,7 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 "if" {return IF;}
 "or" {return OR;}
 "and" {return AND;}
+"auto" {return AUTO;}
 {identifier} {yylval.varname = (char *)malloc (yyleng+1); strcpy (yylval.varname, yytext); return ID;}
 {integer} {yylval.value.TYPE_INT_VAL=atoi(yytext);return INT;}
 {real} {yylval.value.TYPE_FLOAT_VAL=atof(yytext);return REAL;}

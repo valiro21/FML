@@ -25,7 +25,7 @@ struct trie *variables;
 %token <value> BOOL
 %type <value> expr no_op2 no_op3 no_op4 factor
 %token <value> REAL INT CHAR
-%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND
+%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO
 %start program
 %%
 program: instructions {printf("Works\n");}
@@ -43,14 +43,48 @@ instruction : declaration {printf("Rule instruction -> declaration\n");}
 			| assignment {printf("Rule instruction ->assignment\n");}
 			;
 
-assignment : ID ASSIGN expr {printf("Rule assignment -> ID ASSIGN expr\n");}
+assignment : ID ASSIGN expr {struct var_value *var = set(variables, $1, $3);
+															if(var == NULL) {
+																char *error = malloc (256);
+																strcpy (error, "Variable ");
+																strcat (error, $1);
+																strcat (error, " is not declarated");
+																yyerror (error);
+															}
+															printf("Rule assignment -> ID ASSIGN expr\n");}
 		   		 ;
 
-declaration : TYPE ID { create(variables, $2, $1);
+declaration : TYPE ID { if (create(variables, $2, $1) == -1) {
+													char *error = malloc (256);
+													strcpy (error, "Redeclaration of variable ");
+													strcat (error, $2);
+													yyerror (error);
+												}
 												printf("Rule declaration -> TYPE ID\n");}
 			| TYPE ID '(' parameters ')'
 			| TYPE ID '(' ')'
-			| TYPE ID ASSIGN expr
+			| TYPE ID ASSIGN expr { if (create(variables, $2, $1) == -1) {
+																char *error = malloc (256);
+																strcpy (error, "Redeclaration of variable ");
+																strcat (error, $2);
+																yyerror (error);
+															}
+															printf("Rule declaration -> TYPE ID\n");
+															struct var_value *var = get(variables, $2);
+															ASSIGN_CAST((*var), $4);	
+														}
+			| AUTO ID ASSIGN expr {
+													if (create(variables, $2, $4.type) == -1) {
+														char *error = malloc (256);
+														strcpy (error, "Redeclaration of variable ");
+														strcat (error, $2);
+														yyerror (error);
+													}
+													printf("Rule declaration -> TYPE ID\n");
+												
+													struct var_value *var = get(variables, $2);
+													ASSIGN_CAST((*var), $4);
+												}
 			;
 
 vartype : INT
@@ -125,7 +159,7 @@ factor : '(' expr ')'        {ASSIGN($$,$2);}
                               SOLVE($$,minus_one, $2, *);}
        | REAL                {$1.type = TYPE_FLOAT; ASSIGN($$,$1);}
        | INT                 {$1.type = TYPE_INT; ASSIGN($$,$1);}
-			 | ID								   {printf ("GREGSFDGFDSGFDSGDSFFDSGSD\n");
+			 | ID								   {
 															struct var_value *var = get(variables, $1);
 															if(var == NULL) {
 																char *error = malloc (256);
