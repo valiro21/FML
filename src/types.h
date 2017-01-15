@@ -1,5 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
+#define typeof __typeof__
+
 typedef struct var_value {
   union
   {
@@ -15,7 +17,7 @@ typedef struct var_value {
 } var_value;
 
 #define FIELD(var,type) var.type##_VAL
-#define FIELD_CAST(var,type,type_cast) (__typeof__(FIELD(var,type))) FIELD(var,type)
+#define FIELD_CAST(var,type,type_cast) (typeof(FIELD(var,type))) FIELD(var,type)
 #define FIELD_CAST_INT(var,type) *((int *) &var.type##_VAL)
 
 #define CAST(r,t1,t1type,t2,t2type,op) if (t2.type == t2type) {if(t1type <= t2type) { \
