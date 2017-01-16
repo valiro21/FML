@@ -21,11 +21,14 @@ struct trie *variables;
 	char* varname;
 }
 
+%left EQ NEQ LEQ GEQ LOW GRE
 %left '+' '-'
 %left '*' '/'
 %left AND
 %left OR
 %left NEG
+
+
 
 %token <type> TYPE
 %token <varname> ID
@@ -169,7 +172,7 @@ expr : REAL              {$1.type = TYPE_FLOAT; ASSIGN($$,$1);}
      | expr AND expr     {SOLVE_CAST($$,$1,$3,&);}
      | '-' expr  %prec NEG {struct var_value minus_one; minus_one.TYPE_INT_VAL = -1; minus_one.type = TYPE_INT;
                               SOLVE($$,minus_one, $2, *);}
-		 | '(' expr ')'      {ASSIGN($$,$2);}													
+	 | '(' expr ')'      {ASSIGN($$,$2);}
      ;
 
  /*action definitions go here */

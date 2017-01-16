@@ -37,6 +37,13 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 {string} {return STRING;}
 "{" {return BGN;}
 "}" {return END;}
+"==" {return EQ;}
+"!=" {return NEQ;}
+"<=" {return LEQ;}
+">=" {return GEQ;}
+"<" {return LOW;}
+">" {return GRE;}
+"!" {return NEG;}
 "=" {return ASSIGN;}
 [ \t] ;
 \n\n+ {unput('\n'); yylineno+=yyleng-1;}
