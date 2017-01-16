@@ -21,12 +21,18 @@ struct trie *variables;
 	char* varname;
 }
 
+%left '+' '-'
+%left '*' '/'
+%left AND
+%left OR
+%left NEG
+
 %token <type> TYPE
 %token <varname> ID
 %token <value> BOOL
-%type <value> expr no_op2 no_op3 no_op4 factor
+%type <value> expr
 %token <value> REAL INT CHAR
-%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO PRINT
+%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO PRINT NEG
 %start program
 %%
 program: instructions {fprintf(log,"Works\n");}
@@ -142,31 +148,9 @@ call_params : EXPR
 			| call_params ',' EXPR
 			;
 
-expr : no_op2 '+' no_op2          {SOLVE($$,$1,$3,+);}
-     | no_op2 '-' no_op2          {SOLVE($$,$1,$3,-);}
-     | no_op2                     {ASSIGN($$,$1);}
-     ;
-
-no_op2 : no_op3 '*' no_op3     {SOLVE($$,$1,$3,*);}
-       | no_op3 '/' no_op3     {SOLVE($$,$1,$3,/);}
-       | no_op3                {ASSIGN($$,$1);}
-       ;
-
-no_op3 : no_op4 OR no_op4     {SOLVE_CAST($$,$1,$3,|);}
-       | no_op4               {ASSIGN($$,$1);}
-       ;
-
-no_op4 : factor AND factor    {SOLVE_CAST($$,$1,$3,&);}
-       | factor               {ASSIGN($$,$1);}
-       ;
-
-factor : '(' expr ')'        {ASSIGN($$,$2);}
-       | '-' factor          {struct var_value minus_one; minus_one.TYPE_INT_VAL = -1; minus_one.type = TYPE_INT;
-                              SOLVE($$,minus_one, $2, *);}
-       | REAL                {$1.type = TYPE_FLOAT; ASSIGN($$,$1);}
-       | INT                 {$1.type = TYPE_INT; ASSIGN($$,$1);}
-			 | ID								   {
-															struct var_value *var = get(variables, $1);
+expr : REAL              {$1.type = TYPE_FLOAT; ASSIGN($$,$1);}
+     | INT               {$1.type = TYPE_INT; ASSIGN($$,$1);}
+		 | ID								 {struct var_value *var = get(variables, $1);
 															if(var == NULL) {
 																char *error = malloc (256);
 																strcpy (error, "Variable ");
@@ -177,8 +161,16 @@ factor : '(' expr ')'        {ASSIGN($$,$2);}
 															
 															ASSIGN($$,(*var));
 														 }
-															
-       ;
+     | expr '+' expr     {SOLVE($$,$1,$3,+);}
+     | expr '-' expr     {SOLVE($$,$1,$3,-);}
+     | expr '*' expr     {SOLVE($$,$1,$3,*);}
+     | expr '/' expr     {SOLVE($$,$1,$3,/);}
+     | expr OR expr      {SOLVE_CAST($$,$1,$3,|);}
+     | expr AND expr     {SOLVE_CAST($$,$1,$3,&);}
+     | '-' expr  %prec NEG {struct var_value minus_one; minus_one.TYPE_INT_VAL = -1; minus_one.type = TYPE_INT;
+                              SOLVE($$,minus_one, $2, *);}
+		 | '(' expr ')'      {ASSIGN($$,$2);}													
+     ;
 
  /*action definitions go here */
 %%
