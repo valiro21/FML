@@ -35,7 +35,7 @@ struct trie *variables;
 %token <value> BOOL
 %type <value> expr
 %token <value> REAL INT CHAR
-%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO PRINT NEG
+%token STRING BGN ASSIGN EXPR END FOR WHILE IF ELIF ELSE OR AND AUTO PRINT NEG
 %start program
 %%
 program: instructions {fprintf(log,"Works\n");}
@@ -46,7 +46,6 @@ instructions: instruction '\n' {fprintf(log,"Rule instructions -> instruction\n"
 			;
 
 instruction : declaration {fprintf(log,"Rule instruction -> declaration\n");}
-			| if {fprintf(log,"Rule instruction -> if\n");}
 			| while {fprintf(log,"Rule instruction -> while\n");}
 			| functionCall {fprintf(log,"Rule instruction -> functionCall\n");}
 			| for {fprintf(log,"Rule instruction -> for\n");}
@@ -115,27 +114,32 @@ parameters : parameter
 parameter : TYPE ID
 		  ;
 
-boolUnit : ID
-		 | INT
-		 | BOOL
-		 ;
-
-boolExpr : boolUnit
-		 | boolExpr OR boolUnit
-		 | boolExpr AND boolUnit
-		 ;
 
 functionCall : ID '(' call_params ')'
 			 ;
 
-if : IF boolExpr ':' assignment
-   | IF boolExpr ':' functionCall
-   | IF boolExpr ':' BGN '\n' instructions END
+if : IF expr ':' assignment {fprintf(log,"Rule if -> IF\n");}
+   | IF expr ':' functionCall {fprintf(log,"Rule if -> IF\n");}
+   | IF expr ':' BGN '\n' instructions END {fprintf(log,"Rule if -> IF\n");}
    ;
 
-while : WHILE boolExpr ':' assignment
-	  | WHILE boolExpr ':' functionCall
-	  | WHILE boolExpr ':' BGN '\n' instructions END
+elifs : elif {fprintf(log,"Rule elifs -> elif\n");}
+	  | elifs '\n' elif {fprintf(log,"Rule recursive elifs\n");}
+	  ;
+
+elif  : ELIF expr ':' assignment {fprintf(log,"Rule elif -> ELIF\n");}
+	  | ELIF expr ':' functionCall {fprintf(log,"Rule elif -> ELIF\n");}
+	  | ELIF expr ':' BGN '\n' instructions END {fprintf(log,"Rule elif -> ELIF\n");}
+	  ;
+
+else : ELSE ':' assignment {fprintf(log,"Rule else -> ELSE\n");}
+	 | ELSE ':' functionCall {fprintf(log,"Rule else -> ELSE\n");}
+	 | ELSE ':' BGN '\n' instructions END {fprintf(log,"Rule else -> ELSE\n");}
+     ;
+
+while : WHILE expr ':' assignment {fprintf(log,"Rule while -> WHILE\n");}
+	  | WHILE expr ':' functionCall {fprintf(log,"Rule while -> WHILE\n");}
+	  | WHILE expr ':' BGN '\n' instructions END {fprintf(log,"Rule while -> WHILE\n");}
 	  ;
 
 for : FOR ID INT ',' INT ',' INT ':' assignment {fprintf(log,"Rule for\n");}
@@ -153,7 +157,7 @@ call_params : EXPR
 
 expr : REAL              {$1.type = TYPE_FLOAT; ASSIGN($$,$1);}
      | INT               {$1.type = TYPE_INT; ASSIGN($$,$1);}
-		 | ID								 {struct var_value *var = get(variables, $1);
+     | ID								 {struct var_value *var = get(variables, $1);
 															if(var == NULL) {
 																char *error = malloc (256);
 																strcpy (error, "Variable ");

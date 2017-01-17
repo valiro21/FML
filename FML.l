@@ -26,8 +26,8 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 "for" {return FOR;}
 "while" {return WHILE;}
 "if" {return IF;}
-"or" {return OR;}
-"and" {return AND;}
+"elif" {return ELIF;}
+"else" {return ELSE;}
 "auto" {return AUTO;}
 "printf" {return PRINT;}
 {identifier} {yylval.varname = (char *)malloc (yyleng+1); strcpy (yylval.varname, yytext); return ID;}
@@ -37,6 +37,8 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 {string} {return STRING;}
 "{" {return BGN;}
 "}" {return END;}
+"||" {return OR;}
+"&&" {return AND;}
 "==" {return EQ;}
 "!=" {return NEQ;}
 "<=" {return LEQ;}
