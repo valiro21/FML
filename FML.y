@@ -30,12 +30,10 @@ struct trie *variables;
 
 %token <varname> ID
 %token <type> TYPE
-%token <value> BOOL
-%type <node> expr
-%type <node> program instruction instructions declaration if while for assignment functionCall call_params
+%type <node> program instruction instructions declaration if while for assignment functionCall functionDeclaration call_params expr
+%token <value> REAL INT CHAR BOOL
 
-%token <value> REAL INT CHAR
-%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G
+%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF
 %start program
 %%
 program : instructions
@@ -51,7 +49,7 @@ instructions : instruction '\n'
 	fprintf(log,"Rule instructions -> instruction\n");
         $$ = $1;
 }
-													| instructions instruction '\n'
+             | instructions instruction '\n'
 {
 	fprintf(log,"Rule instructions -> instructions instruction\n");
 	$$ = $1;
@@ -64,7 +62,7 @@ instruction : declaration
 	fprintf(log,"Rule instruction -> declaration\n");
 	$$ = $1;
 }
-												| if 
+			| if 
 {
 	fprintf(log,"Rule instruction -> if\n");
 	$$ = $1;
@@ -90,7 +88,12 @@ instruction : declaration
 	fprintf(log,"Rule instruction ->assignment\n"); 
 	$$ = $1;
 }
-			         ;
+			         
+            | functionDeclaration {
+				fprintf(log,"Rule instruction -> function declaration");
+			
+			}
+			;
 
 assignment : ID ASSIGN expr 
 {
@@ -146,6 +149,17 @@ functionCall : ID '(' call_params ')' {
 	$$ = create_node (left, $3, OP_CALL);
 }
 				;
+
+functionDeclaration : ID '(' call_params ')' ':' assignment{
+
+}
+					| ID '(' call_params ')' ':' functionCall {
+
+}
+					| ID '(' call_params ')' ':' BGN '\n' instructions END {
+
+}
+					;
 
 if : IF expr ':' assignment
 {
@@ -210,12 +224,12 @@ call_params : expr
 }
 												;
 
-expr : ID																				
+expr : ID
 {
-    $$ = create_node_var($1); 
+    $$ = create_node_var($1);
 }
      | BOOL                   {$$ = create_node_leaf($1);}
-					| REAL                   {$$ = create_node_leaf ($1);}
+     | REAL                   {$$ = create_node_leaf ($1);}
      | INT                    {$$ = create_node_leaf ($1);}
      | CHAR                   {$$ = create_node_leaf ($1);}
      | expr EQ expr           {$$ = create_node ($1,$3,OP_EQUALS);}

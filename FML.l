@@ -34,6 +34,7 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
     yylval.value->TYPE_BOOL_VAL = 0;
     return BOOL;
 }
+"def" {return DEF;}
 "for" {return FOR;}
 "in" {return IN;}
 "range" {return RANGE;}
