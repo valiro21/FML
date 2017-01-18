@@ -33,7 +33,7 @@ struct trie *variables;
 %type <node> program instruction instructions declaration if while for assignment functionCall functionDeclaration call_params expr define_params
 %token <value> REAL INT CHAR BOOL
 
-%token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF
+%token STRING BGN ASSIGN EXPR END FOR WHILE IF ELIF ELSE OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF
 %start program
 %%
 program : instructions {
@@ -140,8 +140,6 @@ functionCall : ID '(' call_params ')' {
     $$ = create_node (left, $3, OP_CALL);
 }
              ;
-
-functionDeclaration : ID '(' call_params ')' ':' assignment {
 
 functionDeclaration : DEF ID '(' define_params ')' ':' assignment
 {

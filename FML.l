@@ -68,12 +68,6 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 "}" {return END;}
 "||" {return OR;}
 "&&" {return AND;}
-"==" {return EQ;}
-"!=" {return NEQ;}
-"<=" {return LEQ;}
-">=" {return GEQ;}
-"<" {return LOW;}
-">" {return GRE;}
 "!" {return NEG;}
 "=" {return ASSIGN;}
 "==" {return EQ;}
