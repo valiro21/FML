@@ -296,7 +296,7 @@ struct var_value * declare_func(struct parse_node *root) {
 struct var_value* find_var (struct parse_node *root) {
 	struct var_value * val = NULL;
 	int llevel = level;
-	while (val == NULL && llevel >= local) {
+	while (val == NULL && llevel >= 0) {
 		val = get(stack[llevel], root->left->name);
 		llevel--;
 	}
