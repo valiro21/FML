@@ -6,7 +6,7 @@
 #include "parse_trees.h"
 
 extern FILE* yyin;
-FILE * log;
+FILE * ruleLog;
 extern char* yytext;
 extern int yylineno;
 extern int yyerror(char *);
@@ -38,7 +38,7 @@ struct trie *variables;
 %%
 program : instructions
 {
-  fprintf(log,"Works\n");
+  fprintf(ruleLog,"Works\n");
   $$ = $1;
   exec_tree($$);
 }
@@ -46,12 +46,12 @@ program : instructions
 
 instructions : instruction '\n' 
 {
-  fprintf(log,"Rule instructions -> instruction\n");
+  fprintf(ruleLog,"Rule instructions -> instruction\n");
         $$ = $1;
 }
              | instructions instruction '\n'
 {
-  fprintf(log,"Rule instructions -> instructions instruction\n");
+  fprintf(ruleLog,"Rule instructions -> instructions instruction\n");
   $$ = $1;
   add_after($$, $2);
 }
@@ -59,38 +59,38 @@ instructions : instruction '\n'
 
 instruction : declaration 
 {
-  fprintf(log,"Rule instruction -> declaration\n");
+  fprintf(ruleLog,"Rule instruction -> declaration\n");
   $$ = $1;
 }
       | if 
 {
-  fprintf(log,"Rule instruction -> if\n");
+  fprintf(ruleLog,"Rule instruction -> if\n");
   $$ = $1;
 }
                         | while 
 {
-  fprintf(log,"Rule instruction -> while\n");
+  fprintf(ruleLog,"Rule instruction -> while\n");
         $$ = $1;
 }
                         | for 
 {
-  fprintf(log,"Rule instruction -> for\n");
+  fprintf(ruleLog,"Rule instruction -> for\n");
         $$ = $1;
 }
                         | functionCall 
 {
-  fprintf(log,"Rule instruction -> functionCall\n");
+  fprintf(ruleLog,"Rule instruction -> functionCall\n");
   $$ = $1;
 }
 
                         | assignment 
 {
-  fprintf(log,"Rule instruction ->assignment\n"); 
+  fprintf(ruleLog,"Rule instruction ->assignment\n"); 
   $$ = $1;
 }
                
             | functionDeclaration {
-        fprintf(log,"Rule instruction -> function declaration");
+        fprintf(ruleLog,"Rule instruction -> function declaration");
       
       }
       ;
@@ -126,7 +126,7 @@ declaration : TYPE ID
 }
                         | TYPE ID ASSIGN expr 
 { 
-  fprintf(log, "Rule declaration -> TYPE ID\n");
+  fprintf(ruleLog, "Rule declaration -> TYPE ID\n");
   struct parse_node *left = ParseNode();
         left->op = $1;
   struct parse_node *right = ParseNode();
@@ -135,7 +135,7 @@ declaration : TYPE ID
 }
                         | AUTO ID ASSIGN expr
 {
-  fprintf(log,"Rule declaration -> AUTO ID\n");
+  fprintf(ruleLog,"Rule declaration -> AUTO ID\n");
   
   struct parse_node *left = ParseNode(); left->op = TYPE_AUTO;
   struct parse_node *right = ParseNode();
@@ -191,24 +191,24 @@ while : WHILE expr ':' assignment
 
 for : FOR ID IN RANGE '(' expr ',' expr ',' expr ')' ':' assignment
 {
-  fprintf(log,"Rule for\n");
+  fprintf(ruleLog,"Rule for\n");
   $$ = create_node_for_range3 ($2, $6, $8, $10, $13);
 }
 
     | FOR ID IN RANGE '(' expr ',' expr ')' ':' assignment
 {
-  fprintf(log,"Rule for\n");
+  fprintf(ruleLog,"Rule for\n");
   $$ = create_node_for_range2 ($2, $6, $8, $11);
 }
 
     | FOR ID IN RANGE '(' expr ',' expr ',' expr ')' ':' BGN '\n' instructions END
 {
-  fprintf(log,"Rule for\n");
+  fprintf(ruleLog,"Rule for\n");
   $$ = create_node_for_range3 ($2, $6, $8, $10, $15);
 }
     | FOR ID IN RANGE '(' expr ',' expr ')' ':' BGN '\n' instructions END
 {
-  fprintf(log,"Rule for\n");
+  fprintf(ruleLog,"Rule for\n");
   $$ = create_node_for_range2 ($2, $6, $8, $13);
 }
       ;
@@ -261,7 +261,7 @@ int yyerror(char * s){
 }
 
 int main(int argc, char** argv){
-  log = fopen("log.txt","w");
+  ruleLog = fopen("ruleLog.txt","w");
   yyin = fopen(argv[1],"r");
   variables = Trie ();
   stack[0] = Trie();
