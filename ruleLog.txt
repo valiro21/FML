@@ -1,0 +1,32 @@
+Rule declaration -> TYPE ID
+Rule instruction -> declaration
+Rule instructions -> instruction
+Rule declaration -> AUTO ID
+Rule instruction -> declaration
+Rule instructions -> instructions instruction
+Rule instruction ->assignment
+Rule instructions -> instruction
+Rule instruction -> if
+Rule instructions -> instruction
+Rule instruction ->assignment
+Rule instructions -> instructions instruction
+Rule instruction -> while
+Rule instructions -> instructions instruction
+Rule instruction ->assignment
+Rule instructions -> instructions instruction
+Rule instruction -> function declarationRule instructions -> instruction
+Rule instruction -> declaration
+Rule instructions -> instructions instruction
+Rule declaration -> TYPE ID
+Rule instruction -> declaration
+Rule instructions -> instructions instruction
+Rule instruction -> functionCall
+Rule instructions -> instruction
+Rule instruction -> functionCall
+Rule instructions -> instructions instruction
+Rule instruction -> if
+Rule instructions -> instruction
+Rule for
+Rule instruction -> for
+Rule instructions -> instructions instruction
+Works

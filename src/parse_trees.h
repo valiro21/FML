@@ -34,7 +34,8 @@ typedef struct parse_node {
 #define OP_WHILE 16
 #define OP_CALL 17
 #define OP_VAR 18
-#define OP_DEFINE 19
+#define OP_DECL_FUNC 19
+#define OP_MOD 20
 #define MAX_LEVEL 256
 
 
@@ -59,7 +60,8 @@ extern struct var_value* declare (struct parse_node *root);
 extern struct var_value* op_if (struct parse_node *root);
 extern struct var_value* op_while (struct parse_node *root);
 extern struct var_value* assign (struct parse_node *root);
+extern struct parse_node* find_func (struct parse_node *root);
 extern struct var_value* find_var (struct parse_node *root);
 extern struct var_value* op_call (struct parse_node *root);
-extern struct var_value* op_define (struct parse_node *root);
+extern struct var_value* op_declare_func (struct parse_node *root);
 #endif

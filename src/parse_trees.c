@@ -135,6 +135,8 @@ struct var_value* operation (struct parse_node *root) {
 			break;
 		case OP_OR: SOLVE_CAST((*result),(*left),(*right),|);
 			break;
+		case OP_MOD: SOLVE_CAST((*result),(*left),(*right),%);
+			break;
 	}
 	return result;
 }
@@ -230,6 +232,16 @@ struct var_value* assign (struct parse_node *root) {
 	return left;
 }
 
+struct parse_node* find_func (struct parse_node *root) {
+	struct parse_node * val = NULL;
+	int llevel = level;
+	while (val == NULL && llevel >= 0) {
+		val = get_func(stack[llevel], root->left->name);
+		llevel--;
+	}
+	return val;
+}
+
 struct var_value* op_call (struct parse_node *root) {
 	struct var_value *result;
 	if (strcmp(root->left->name, "print") == 0) {
@@ -238,10 +250,12 @@ struct var_value* op_call (struct parse_node *root) {
 		return result;
 	}
 	else {
-		struct parse_node *f = get_func (stack[0], root->left->name);
+		struct parse_node *f = find_func (root);
+		
+
 		if (f == NULL) {
 			error("Function definition not found");
-			}
+		}
 		
 		// check args
 		struct parse_node *arg1, *arg2;
@@ -275,6 +289,10 @@ struct var_value* op_call (struct parse_node *root) {
 	}
 }
 
+struct var_value * declare_func(struct parse_node *root) {
+	create_func (stack[level], root->left->name, root);
+}
+
 struct var_value* find_var (struct parse_node *root) {
 	struct var_value * val = NULL;
 	int llevel = level;
@@ -294,6 +312,7 @@ struct var_value* exec (struct parse_node *root) {
 		case OP_DIV: // /
 		case OP_AND: // &
 		case OP_OR: // |
+            case OP_MOD: // %
 			return operation(root);
 		case OP_EQUALS: // ==
 		case OP_NOT_EQUALS: // !=
@@ -314,8 +333,10 @@ struct var_value* exec (struct parse_node *root) {
 			return op_call (root);
 		case OP_VAR:
 			return find_var(root);
-            case OP_VALUE:
-                return root->value;
+  case OP_VALUE:
+   return root->value;
+		case OP_DECL_FUNC:
+			return declare_func(root);
   default:
     return root->value;
 	}

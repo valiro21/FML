@@ -23,14 +23,14 @@ struct trie *variables;
 }
 %left EQ NEQ LE L GE G
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %left AND
 %left OR
 %left NEG
 
 %token <varname> ID
 %token <type> TYPE
-%type <node> program instruction instructions declaration if while for assignment functionCall functionDeclaration call_params expr
+%type <node> program instruction instructions declaration if while for assignment functionCall functionDeclaration call_params expr define_params
 %token <value> REAL INT CHAR BOOL
 
 %token STRING BGN ASSIGN EXPR END FOR WHILE IF OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF
@@ -89,11 +89,12 @@ instruction : declaration
   $$ = $1;
 }
                
-            | functionDeclaration {
-        fprintf(ruleLog,"Rule instruction -> function declaration");
-      
-      }
-      ;
+                        | functionDeclaration
+{
+  fprintf(ruleLog,"Rule instruction -> function declaration");
+  $$ = $1;   
+}
+                        ;
 
 assignment : ID ASSIGN expr 
 {
@@ -150,14 +151,19 @@ functionCall : ID '(' call_params ')' {
 }
         ;
 
-functionDeclaration : ID '(' call_params ')' ':' assignment{
-
+functionDeclaration : DEF ID '(' define_params ')' ':' assignment
+{
+ struct parse_node* left = ParseNode(); left->name = strdup($2);
+	$$ = create_node_full(left, $4, $7, OP_DECL_FUNC);
 }
-          | ID '(' call_params ')' ':' functionCall {
-
+          | DEF ID '(' define_params ')' ':' functionCall
+{
+ struct parse_node* left = ParseNode(); left->name = strdup($2);
+	$$ = create_node_full(left, $4, $7, OP_DECL_FUNC);
 }
-          | ID '(' call_params ')' ':' BGN '\n' instructions END {
-
+          | DEF ID '(' define_params ')' ':' BGN '\n' instructions END {
+ struct parse_node* left = ParseNode(); left->name = strdup($2);
+	$$ = create_node_full(left, $4, $9, OP_DECL_FUNC);
 }
           ;
 
@@ -222,12 +228,23 @@ call_params : expr
   $$ = $1;
   add_after($$, $3);
 }
+
+define_params : declaration
+{
+  $$ = $1;
+}
+                        | define_params ',' declaration
+{
+  $$ = $1;
+  add_after($$, $3);
+}
                         ;
 
 expr : ID
 {
     $$ = create_node_var($1);
 }
+					| functionCall											{$$ = $1;}
      | BOOL                   {$$ = create_node_leaf($1);}
      | REAL                   {$$ = create_node_leaf ($1);}
      | INT                    {$$ = create_node_leaf ($1);}
@@ -242,6 +259,7 @@ expr : ID
      | expr '-' expr          {$$ = create_node ($1,$3,OP_MINUS);}
      | expr '*' expr          {$$ = create_node ($1,$3,OP_MUL);}
      | expr '/' expr          {$$ = create_node ($1,$3,OP_DIV);}
+     | expr '%' expr          {$$ = create_node ($1,$3,OP_MOD);}
      | expr OR expr           {$$ = create_node ($1,$3,OP_OR);}
      | expr AND expr          {$$ = create_node ($1,$3,OP_AND);}
      | '-' expr               {struct var_value *minus_one = VarValue();
