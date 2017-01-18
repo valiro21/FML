@@ -11,7 +11,7 @@
 real [0-9]+(\.[0-9]*)?([eE]-?[0-9]+)?
 integer [0-9]+
 char '.|\n'
-string "(.|\n)+"
+string ["][a-zA-Z]+["]
 identifier [_a-zA-Z][_a-zA-Z0-9]*
 
 %%

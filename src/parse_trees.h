@@ -9,9 +9,7 @@ typedef struct parse_node {
             var_value *value;
             char *name;
 	};
-	
 	struct parse_node *left, *right, *els;
-
 	struct parse_node *next;
 } parse_node;
 

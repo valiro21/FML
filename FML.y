@@ -31,9 +31,9 @@ struct trie *variables;
 %token <varname> ID
 %token <type> TYPE
 %type <node> program instruction instructions declaration while for assignment functionCall functionDeclaration call_params expr define_params stmt stmte
-%token <value> REAL INT CHAR BOOL
+%token <value> REAL INT CHAR BOOL STRING
 
-%token STRING BGN ASSIGN EXPR END FOR WHILE IF ELIF ELSE OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF
+%token BGN ASSIGN EXPR END FOR WHILE IF ELIF ELSE OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF
 %start program
 
 %nonassoc IFX
@@ -249,12 +249,15 @@ define_params : declaration{
 }
                         ;
 
+
+
 expr : ID                     {$$ = create_node_var($1);}
 	 | functionCall	          {$$ = $1;}
      | BOOL                   {$$ = create_node_leaf($1);}
      | REAL                   {$$ = create_node_leaf ($1);}
      | INT                    {$$ = create_node_leaf ($1);}
      | CHAR                   {$$ = create_node_leaf ($1);}
+	 | STRING                 {$$ = create_node_leaf ($1);}
      | expr EQ expr           {$$ = create_node ($1,$3,OP_EQUALS);}
      | expr NEQ expr          {$$ = create_node ($1,$3,OP_NOT_EQUALS);}
      | expr LE expr           {$$ = create_node ($1,$3,OP_LESS_EQUALS);}

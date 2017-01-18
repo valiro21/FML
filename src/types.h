@@ -11,6 +11,7 @@ typedef struct var_value {
     float TYPE_FLOAT_VAL;
     long long TYPE_LONGLONG_VAL;
     double TYPE_DOUBLE_VAL;
+	char* TYPE_STRING_VAL;
   };
 
   char type;
