@@ -33,8 +33,7 @@ void error (const char *format, ...) {
 }
 
 void assert_cast (int type1, int type2) {
-
 if (type1 / 7 != type2 / 7) {
-		error("Assignment of incompatible types");
+		error("assignment of incompatible types\n");
 	}
 }
