@@ -5,9 +5,7 @@ def euclid (int x, int y):
 		z = x % y
 		x = y
 		y = z
-	}
 	cmmdc = x
-}
 int x = 10
 int y = 5
 int rez = euclid(x,y)

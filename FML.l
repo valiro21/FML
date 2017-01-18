@@ -3,7 +3,10 @@
 #include <string.h>
 #include "types.h"
 #include "FML.tab.h"
+#include "indent.h"
 #define MAX_LEVEL 101
+
+int skip_next = 0;
 
 %}
 
@@ -13,8 +16,41 @@ integer [0-9]+
 char '.|\n'
 string ["][a-zA-Z]+["]
 identifier [_a-zA-Z][_a-zA-Z0-9]*
-
+ENDL \n
+spaces [ |\t]
 %%
+.*\n {
+    if (skip_next > 0) {
+        REJECT;
+    }
+    
+    int end_tokens = check_indent (yytext);
+    for (int i = yyleng - 1; i >= 0; i--)
+        unput(yytext[i]);
+    skip_next = 1;
+    for(int i = 0; i < end_tokens; i++) {
+        unput('}');
+    }
+}
+\n\n+ {
+int end_tokens = check_indent ("");
+for(int i = 0; i < end_tokens; i++) {
+        unput('}');
+}
+unput('\n');
+yylineno+=yyleng-1;}
+.*:([ ]|[\t])*\n {
+	FIRST_IN_BLOCK = 1;
+	REJECT;
+}
+"}" {unput('\n');yylineno--;return END;}
+{ENDL} {
+    if (skip_next == 1) {
+        skip_next--;
+    }
+    yylineno++;
+    return yytext[0];
+}
 "int" {yylval.type = 2; return TYPE;}
 "float" {yylval.type = 3; return TYPE;}
 "string" {yylval.type = 6; return TYPE;}
@@ -65,7 +101,6 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
     return CHAR;
 }
 {string} {return STRING;}
-"}" {return END;}
 "!" {return NEG;}
 "=" {return ASSIGN;}
 "==" {return EQ;}
@@ -75,8 +110,6 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 ">=" {return GE;}
 ">" {return G;}
 [ \t] ;
-\n\n+ {unput('\n'); yylineno+=yyleng-1;}
-\n {yylineno++; return yytext[0]; }
 . {return yytext[0];}
 
 %%

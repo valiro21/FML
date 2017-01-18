@@ -1,19 +1,15 @@
-bool prime = true
-def isprime  (int i) : 
-	auto j = 2
-	while j * j <= i: 
-  		if i % j == 0: 
-			prime = false
-  		}
-  		j = j + 1
-	}
-	prime = prime
-}
+def isprime ( int i ):
+ bool prime = true
+ auto j = 2
+ while j * j <= i:
+  if i % j == 0:
+   prime = false
+  j = j + 1
+ prime = prime
 int i
 char c = 10
 for i in range (2,101,1):
  if isprime(i):
-	 print(i)
+  print(i)
   print (c)
- }	
-}
+
