@@ -10,4 +10,5 @@ def euclid (int x, int y):{
 }
 int x = 10
 int y = 5
-euclid(x,y)
+int rez = euclid(x,y)
+print (rez)
