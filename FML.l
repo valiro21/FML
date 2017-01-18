@@ -36,14 +36,12 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 }
 "or"|"||" {return OR;}
 "and"|"&&" {return AND;}
-
 "def" {return DEF;}
 "for" {return FOR;}
 "in" {return IN;}
 "range" {return RANGE;}
 "while" {return WHILE;}
 "if" {return IF;}
-"elif" {return ELIF;}
 "else" {return ELSE;}
 "auto" {return AUTO;}
 "printf" {return PRINT;}
