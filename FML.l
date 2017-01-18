@@ -65,7 +65,6 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
     return CHAR;
 }
 {string} {return STRING;}
-"{" {return BGN;}
 "}" {return END;}
 "!" {return NEG;}
 "=" {return ASSIGN;}

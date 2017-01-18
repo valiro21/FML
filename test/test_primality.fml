@@ -1,8 +1,8 @@
-def isprime ( int i ): {
+def isprime ( int i ):
 	bool prime = true
 	auto j = 2
-	while j * j <= i: {
-  if i % j == 0: {
+	while j * j <= i:
+  if i % j == 0:
 			prime = false
   }
   j = j + 1
@@ -11,8 +11,8 @@ def isprime ( int i ): {
 } 
 int i
 char c = 10
-for i in range (2,101,1): {
- if isprime(i): {
+for i in range (2,101,1):
+ if isprime(i):
 	 print(i)
   print (c)
  }	

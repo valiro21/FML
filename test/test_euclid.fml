@@ -1,7 +1,7 @@
 int cmmdc = 1
-def euclid (int x, int y):{
+def euclid (int x, int y):
 	int z
-	while y > 1: {
+	while y > 1:
 		z = x % y
 		x = y
 		y = z
