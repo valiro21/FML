@@ -4,6 +4,7 @@
 #include "types.h"
 #include "trie.h"
 #include "parse_trees.h"
+#include "indent.h"
 
 extern FILE* yyin;
 FILE * ruleLog;
@@ -295,7 +296,9 @@ int yyerror(char * s){
 int main(int argc, char** argv){
   ruleLog = fopen("ruleLog.txt","w");
   yyin = fopen(argv[1],"r");
+  add_indent_level ("", 0);
   variables = Trie ();
   stack[0] = Trie();
+  FIRST_IN_BLOCK = 0;
   yyparse();
 }
