@@ -1,0 +1,4 @@
+int x = 2
+if b:
+ print(x)
+
