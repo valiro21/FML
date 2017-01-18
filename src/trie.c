@@ -1,4 +1,5 @@
 #include "trie.h"
+#include "parse_trees.h"
 #include <string.h>
 
 
@@ -15,7 +16,7 @@ void delete(struct trie *t) {
 	if (t->children == NULL) {
 		return;
 	}
-	
+	return;
 	for (int i = 0; i < TRIE_CH; i++) {
 		delete (t->children[i]);
 	}
@@ -30,11 +31,12 @@ struct var_value* get(struct trie *t, char *name) {
 	int nrc = strlen (name);
 	struct trie *tp = t;
 	for (int i = 0; i < strlen (name); i++) {
+            if (tp == NULL) return NULL;
 		if (tp->children == NULL) {
 			return NULL;
 		}
 		else {
-			tp = tp->children[number(name[i])];
+                    tp = tp->children[number(name[i])];
 		}
 	}
 	return tp->value;
@@ -89,4 +91,46 @@ var_value* set(struct trie *t, char *name, var_value val) {
 	ASSIGN_CAST((*(tp->value)), val)
 
 	return tp->value;
+}
+
+
+int create_func(struct trie *t, char *name, struct parse_node *node) {
+	struct var_value *tval = get(t, name);
+	if(t == NULL) return 1;
+
+	if(tval != NULL) {
+		return -1;
+	}
+	else {
+		struct trie *tp = t;
+		for (int i = 0; i < strlen (name); i++) {
+			if (tp->children == NULL) {
+				tp->children = (struct trie **)malloc(sizeof(struct trie *) * TRIE_CH);
+				for (int i = 0; i < TRIE_CH; i++)
+					tp->children[i] = Trie();
+			}
+			tp = tp->children[number(name[i])];
+		}
+		
+		if (tp->func == NULL)
+			tp->func = node;
+	}
+	return 0;
+}
+
+struct parse_node* get_func(struct trie *t, char *name) {
+	if (t == NULL) return NULL;
+
+	int nrc = strlen (name);
+	struct trie *tp = t;
+	for (int i = 0; i < strlen (name); i++) {
+		if (tp->children == NULL) {
+			return NULL;
+		}
+		else {
+			tp = tp->children[number(name[i])];
+		}
+	}
+	
+	return tp->func;
 }

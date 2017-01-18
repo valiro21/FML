@@ -16,6 +16,8 @@ typedef struct var_value {
   char type;
 } var_value;
 
+extern struct var_value* VarValue ();
+
 #define FIELD(var,type) var.type##_VAL
 #define FIELD_CAST(var,type,type_cast) (typeof(FIELD(var,type))) FIELD(var,type)
 #define FIELD_CAST_INT(var,type) *((int *) &var.type##_VAL)
@@ -29,6 +31,17 @@ typedef struct var_value {
                                             FIELD(r, t1type) = FIELD(t1,t1type) op FIELD(t2,t2type); \
                                         } }
 
+#define CAST_COMPARE(r,t1,t1type,t2,t2type,op) if (t1.type == t1type && t2.type == t2type) { \
+																								if(FIELD (t1, t1type) op FIELD (t2,t2type)) { \
+																									r.type = TYPE_BOOL; \
+                                            			FIELD(r, TYPE_BOOL) = 1; \
+																								} \
+                                        				else { \
+																									r.type = TYPE_BOOL; \
+                                            			FIELD(r, TYPE_BOOL) = 0; \
+                                        				} \
+																							} \
+
 #define CAST_CAST(r,t1,t1type,t2,t2type,op) if (t2.type == t2type) {if(t1type <= t2type) { \
 																						r.type=t2type; \
                                             int x = FIELD_CAST_INT(t1,t1type) op FIELD_CAST_INT(t2,t2type); \
@@ -41,8 +54,8 @@ typedef struct var_value {
                                         } }
 
 
-#define SVAR TYPE_BOOL,TYPE_CHAR,TYPE_INT,TYPE_FLOAT,TYPE_LONGLONG,TYPE_DOUBLE;
-#define SETVARS TYPE_BOOL=0,TYPE_CHAR=1,TYPE_INT=2,TYPE_FLOAT=3,TYPE_LONGLONG=4,TYPE_DOUBLE=5;
+#define SVAR TYPE_BOOL,TYPE_CHAR,TYPE_INT,TYPE_FLOAT,TYPE_LONGLONG,TYPE_DOUBLE, TYPE_AUTO, TYPE_STRING, TYPE_UNKNOWN;
+#define SETVARS TYPE_BOOL=0,TYPE_CHAR=1,TYPE_INT=2,TYPE_FLOAT=3,TYPE_LONGLONG=4,TYPE_DOUBLE=5, TYPE_AUTO = 6, TYPE_STRING=7, TYPE_UNKNOWN = 8;
 extern char SVAR;
 
 #define SET(r,t1,TYPE,t2,op) if (t1.type == TYPE) { \
@@ -60,6 +73,23 @@ extern char SVAR;
                             SET (r, t1, TYPE_FLOAT, t2, op) \
                             SET (r, t1, TYPE_LONGLONG, t2, op) \
                             SET (r, t1, TYPE_DOUBLE, t2, op) \
+
+#define SET_COMPARE(r,t1,TYPE,t2,op) if (t1.type == TYPE) { \
+                            CAST_COMPARE (r,t1,TYPE,t2, TYPE_BOOL, op) \
+                            CAST_COMPARE (r,t1,TYPE,t2, TYPE_CHAR, op) \
+                            CAST_COMPARE (r,t1,TYPE,t2, TYPE_INT, op) \
+                            CAST_COMPARE (r,t1,TYPE,t2, TYPE_FLOAT, op) \
+                            CAST_COMPARE (r,t1,TYPE,t2, TYPE_LONGLONG, op) \
+                            CAST_COMPARE (r,t1,TYPE,t2, TYPE_DOUBLE, op) \
+                            }
+
+#define COMPARE(r,t1,t2,op)  SETVARS \
+                            SET_COMPARE (r, t1, TYPE_BOOL, t2, op) \
+                            SET_COMPARE (r, t1, TYPE_CHAR, t2, op) \
+                            SET_COMPARE (r, t1, TYPE_INT, t2, op) \
+                            SET_COMPARE (r, t1, TYPE_FLOAT, t2, op) \
+                            SET_COMPARE (r, t1, TYPE_LONGLONG, t2, op) \
+                            SET_COMPARE (r, t1, TYPE_DOUBLE, t2, op) \
 
 #define SET_CAST(r,t1,TYPE,t2,op) if (t1.type == TYPE) { \
                             CAST_CAST (r,t1,TYPE,t2, TYPE_BOOL, op) \
@@ -131,4 +161,8 @@ const char * format_TYPE_DOUBLE;
                       TYPE_PRINT(r,TYPE_FLOAT) \
                       TYPE_PRINT(r,TYPE_LONGLONG) \
                       TYPE_PRINT(r,TYPE_DOUBLE)
+
+extern void error (const char *);
+extern void assert_cast(int type1, int type2);
+
 #endif
