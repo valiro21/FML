@@ -51,13 +51,13 @@ yylineno+=yyleng-1;}
     yylineno++;
     return yytext[0];
 }
-"int" {yylval.type = 2; return TYPE;}
-"float" {yylval.type = 3; return TYPE;}
-"string" {yylval.type = 6; return TYPE;}
-"char" {yylval.type = 1; return TYPE;}
-"double" {yylval.type = 5; return TYPE;}
-"longlong" {yylval.type = 4; return TYPE;}
-"bool" {yylval.type = 0; return TYPE;}
+"int" {yylval.type = TYPE_INT; return TYPE;}
+"float" {yylval.type = TYPE_FLOAT; return TYPE;}
+"string" {yylval.type = TYPE_STRING; return TYPE;}
+"char" {yylval.type = TYPE_CHAR; return TYPE;}
+"double" {yylval.type = TYPE_DOUBLE; return TYPE;}
+"longlong" {yylval.type = TYPE_LONGLONG; return TYPE;}
+"bool" {yylval.type = TYPE_BOOL; return TYPE;}
 "true" {
     yylval.value = VarValue();
     yylval.value->type = 0;
