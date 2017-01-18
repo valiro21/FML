@@ -7,7 +7,7 @@
 #define MAX_LEVEL 101
 
 int skip_next = 0;
-
+int once_eof = 0;
 %}
 
  /* Identifier definitions go here such as */
@@ -19,7 +19,9 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 ENDL \n
 spaces [ |\t]
 %%
-.*\n {
+[ \t]+\n  {yylineno++;}
+<<EOF>>   {if (!once_eof) {once_eof = 1;unput('\n');unput (0);}}
+(.*\n) {
     if (skip_next > 0) {
         REJECT;
     }
