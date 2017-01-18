@@ -30,7 +30,7 @@ struct trie *variables;
 
 %token <varname> ID
 %token <type> TYPE
-%type <node> program instruction instructions declaration if while for assignment functionCall functionDeclaration call_params expr define_params
+%type <node> program instruction instructions declaration if while for assignment functionCall functionDeclaration call_params expr define_params stmt
 %token <value> REAL INT CHAR BOOL
 
 %token STRING BGN ASSIGN EXPR END FOR WHILE IF ELIF ELSE OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF
@@ -157,24 +157,21 @@ functionDeclaration : DEF ID '(' define_params ')' ':' assignment
 }
                     ;
 
-if : IF expr ':' assignment {
+
+stmt : assignment
+	 | functionCall
+	 ;
+
+
+if : IF expr ':' stmt {
     $$ = create_node ($2, $4, OP_IF);
 }
-
-   | IF expr ':' functionCall {
-    $$ = create_node ($2, $4, OP_IF);
-}
-
    | IF expr ':' BGN '\n' instructions END {
-    $$ = create_node ($2, $6, OP_IF);
+	$$ = create_node ($2, $6, OP_IF);
 }
    ;
 
-while : WHILE expr ':' assignment {
-    $$ = create_node ($2, $4, OP_WHILE);
-}
-
-      | WHILE expr ':' functionCall {
+while : WHILE expr ':' stmt {
     $$ = create_node ($2, $4, OP_WHILE);
 }
 
@@ -213,21 +210,17 @@ call_params : expr {
     add_after($$, $3);
 }
 
-define_params : declaration
-{
-  $$ = $1;
+define_params : declaration{
+    $$ = $1;
 }
-                        | define_params ',' declaration
-{
-  $$ = $1;
-  add_after($$, $3);
+              | define_params ',' declaration{
+    $$ = $1;
+    add_after($$, $3);
 }
                         ;
 
-expr : ID {
-    $$ = create_node_var($1);
-}
-					| functionCall											{$$ = $1;}
+expr : ID                     {$$ = create_node_var($1);}
+	 | functionCall	          {$$ = $1;}
      | BOOL                   {$$ = create_node_leaf($1);}
      | REAL                   {$$ = create_node_leaf ($1);}
      | INT                    {$$ = create_node_leaf ($1);}
