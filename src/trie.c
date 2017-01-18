@@ -47,6 +47,7 @@ int create(struct trie *t, char *name, int TYPE) {
 	if(t == NULL) return 1;
 
 	if(tval != NULL) {
+	 error ("redefinition if variable %s\n");
 		return -1;
 	}
 	else {
@@ -62,6 +63,9 @@ int create(struct trie *t, char *name, int TYPE) {
 		
 		if (tp->value == NULL)
 			tp->value = (struct var_value *)malloc (sizeof (struct var_value *));
+		else {
+			error ("redefinition of variable %s\n", name);
+		}
 		tp->value->type = TYPE;
 		struct var_value zero;
 		zero.type = TYPE_INT;
