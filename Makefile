@@ -4,16 +4,16 @@ ifndef OUTPUT
 OUTPUT_REDIR=>/dev/null
 endif
 
-a.out: lex.yy.c y.tab.h y.tab.c src/types.c src/types.h src/parse_trees.c src/parse_trees.h
+a.out: lex.yy.c FML.tab.h FML.tab.c src/types.c src/types.h src/parse_trees.c src/parse_trees.h
 	gcc -ggdb -std=gnu99 src/parse_trees.c src/types.c src/trie.c FML.tab.c lex.yy.c -ll -ly -I${INCLUDE_DIR}
 
 lex.yy.c: FML.l
 	lex FML.l
 
-y.tab.h: FML.y
-	bison -d FML.y
+FML.tab.h: FML.y
+	bison FML.y -d
 
-y.tab.c:  FML.y
+FML.tab.c:  FML.y
 	bison FML.y
 
 clean:
