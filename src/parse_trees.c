@@ -122,6 +122,7 @@ struct var_value* operation (struct parse_node *root) {
 	struct var_value *right = exec_tree (root->right);
 	struct var_value *result = VarValue ();
 
+	assert_cast (left->type, right->type);
 	switch (root->op) {
 		case OP_PLUS: SOLVE((*result),(*left),(*right),+);
 			break;
@@ -145,6 +146,8 @@ struct var_value* compare (struct parse_node *root) {
 	struct var_value *left = exec_tree (root->left);
 	struct var_value *right = exec_tree (root->right);
 	struct var_value *result = VarValue ();
+	
+	assert_cast (left->type, right->type);
 
 	switch (root->op) {
 		case OP_EQUALS: COMPARE((*result),(*left),(*right),==);
@@ -171,9 +174,9 @@ struct var_value* declare (struct parse_node *root) {
 	if (root->left->op == TYPE_AUTO) {
 	  create(stack[level], root->right->name, val->type);
 	}
-        else {
-          create (stack[level], root->right->name, root->left->op);
-        }
+ else {
+  create (stack[level], root->right->name, root->left->op);
+ }
 
 	if (root->els != NULL) {
 		set(stack[level], root->right->name, *val);
@@ -209,8 +212,6 @@ struct var_value* op_if (struct parse_node *root) {
 struct var_value* op_while (struct parse_node *root) {
 		struct var_value *left, *right;
 		
-		
-
 		left = exec (root->left);
 		while (left->TYPE_LONGLONG_VAL != 0) {
                     inc_stack ();
@@ -299,6 +300,9 @@ struct var_value* find_var (struct parse_node *root) {
 	while (val == NULL && llevel >= 0) {
 		val = get(stack[llevel], root->left->name);
 		llevel--;
+	}
+	if (val == NULL) {
+	 error ("Variable %s not declared", root->left->name);
 	}
 	return val;
 }
