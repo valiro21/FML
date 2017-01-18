@@ -295,5 +295,6 @@ int main(int argc, char** argv){
   variables = Trie ();
   stack[0] = Trie();
   FIRST_IN_BLOCK = 0;
+  lineno = &yylineno;
   yyparse();
 }
