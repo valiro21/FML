@@ -30,11 +30,15 @@ struct trie *variables;
 
 %token <varname> ID
 %token <type> TYPE
-%type <node> program instruction instructions declaration if while for assignment functionCall functionDeclaration call_params expr define_params stmt
+%type <node> program instruction instructions declaration while for assignment functionCall functionDeclaration call_params expr define_params stmt stmte
 %token <value> REAL INT CHAR BOOL
 
 %token STRING BGN ASSIGN EXPR END FOR WHILE IF ELIF ELSE OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF
 %start program
+
+%nonassoc IFX
+%nonassoc ELSE
+
 %%
 program : instructions {
     fprintf(ruleLog,"Works\n");
@@ -53,18 +57,32 @@ instructions : instruction '\n' {
     $$ = $1;
     add_after($$, $2);
 }
+            | IF stmt '\n' %prec IFX {
+    fprintf(ruleLog,"Rule instruction -> if\n");
+    $$ = $2;
+}
+            | IF stmt '\n' ELSE stmte '\n' {
+    fprintf(ruleLog,"Rule instruction -> if\n");
+    $$ = $2;
+				$$->els = $5;
+}
+            | instructions IF stmt '\n' %prec IFX {
+    fprintf(ruleLog,"Rule instruction -> if\n");
+    $$ = $1;
+				add_after($$, $3);
+}
+            | instructions IF stmt '\n' ELSE stmte '\n' {
+    fprintf(ruleLog,"Rule instruction -> if\n");
+    $$ = $1;
+				$3->els = $6;
+				add_after($$,$3);
+}
              ;
 
 instruction : declaration {
     fprintf(ruleLog,"Rule instruction -> declaration\n");
     $$ = $1;
 }
-
-            | if {
-    fprintf(ruleLog,"Rule instruction -> if\n");
-    $$ = $1;
-}
-
             | while {
     fprintf(ruleLog,"Rule instruction -> while\n");
     $$ = $1;
@@ -157,17 +175,29 @@ functionDeclaration : DEF ID '(' define_params ')' ':' assignment
 }
                     ;
 
-
-stmt : assignment
-	 | functionCall
-	 ;
-
-
-if : IF expr ':' stmt {
-    $$ = create_node ($2, $4, OP_IF);
+stmt : expr ':' assignment {
+    $$ = create_node ($1, $3, OP_IF);
 }
-   | IF expr ':' BGN '\n' instructions END {
-	$$ = create_node ($2, $6, OP_IF);
+
+   | expr ':' functionCall {
+    $$ = create_node ($1, $3, OP_IF);
+}
+
+   | expr ':' BGN '\n' instructions END {
+    $$ = create_node ($1, $5, OP_IF);
+}
+   ;
+
+stmte : ':' assignment {
+    $$ = create_node (NULL, $2, OP_IF);
+}
+
+   | ':' functionCall {
+    $$ = create_node (NULL, $2, OP_IF);
+}
+
+   | ':' BGN '\n' instructions END {
+    $$ = create_node (NULL, $4, OP_IF);
 }
    ;
 
