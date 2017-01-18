@@ -32,5 +32,8 @@ test_trie.a: src/types.c src/trie.c src/trie.h src/types.h test/test_trie.c src/
 	gcc -ggdb -std=gnu99 src/parse_trees.c src/types.c src/trie.c test/test_trie.c src/indent.c -o test_trie.a -I${INCLUDE_DIR} -ll
 
 test_FML: a.out ${TEST_FILES}
+	@echo "Good tests: "
 	@$(foreach test_file, $(TEST_FILES_PASS), /bin/echo -e -n "\033[0;31mParsing $(test_file)\033[0m" && ./a.out "$(test_file)" ${OUTPUT_REDIR} && /bin/echo -e "\033[0;32m   ->   Passed!\033[0m" && ) true || false
+	@echo ""
+	@echo "Bad tests: "
 	@$(foreach test_file, $(TEST_FILES_FAIL), (/bin/echo -e -n "\033[0;31mParsing $(test_file)\033[0m" && ./a.out "$(test_file)" ${OUTPUT_REDIR} || /bin/echo -e "\033[0;32m   ->   Passed!\033[0m") && ) false || true
