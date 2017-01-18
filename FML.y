@@ -16,10 +16,10 @@ struct trie *variables;
 %}
  /*token declarations go here */
 %union {
-	struct var_value *value;
-	int type;
-	char* varname;
-	struct parse_node* node;
+  struct var_value *value;
+  int type;
+  char* varname;
+  struct parse_node* node;
 }
 %left EQ NEQ LE L GE G
 %left '+' '-'
@@ -38,191 +38,191 @@ struct trie *variables;
 %%
 program : instructions
 {
-	fprintf(log,"Works\n");
-	$$ = $1;
-	exec_tree($$);
+  fprintf(log,"Works\n");
+  $$ = $1;
+  exec_tree($$);
 }
         ;
 
 instructions : instruction '\n' 
 {
-	fprintf(log,"Rule instructions -> instruction\n");
+  fprintf(log,"Rule instructions -> instruction\n");
         $$ = $1;
 }
              | instructions instruction '\n'
 {
-	fprintf(log,"Rule instructions -> instructions instruction\n");
-	$$ = $1;
-	add_after($$, $2);
+  fprintf(log,"Rule instructions -> instructions instruction\n");
+  $$ = $1;
+  add_after($$, $2);
 }
-													;
+                          ;
 
 instruction : declaration 
 {
-	fprintf(log,"Rule instruction -> declaration\n");
-	$$ = $1;
+  fprintf(log,"Rule instruction -> declaration\n");
+  $$ = $1;
 }
-			| if 
+      | if 
 {
-	fprintf(log,"Rule instruction -> if\n");
-	$$ = $1;
+  fprintf(log,"Rule instruction -> if\n");
+  $$ = $1;
 }
-												| while 
+                        | while 
 {
-	fprintf(log,"Rule instruction -> while\n");
+  fprintf(log,"Rule instruction -> while\n");
         $$ = $1;
 }
-												| for 
+                        | for 
 {
-	fprintf(log,"Rule instruction -> for\n");
+  fprintf(log,"Rule instruction -> for\n");
         $$ = $1;
 }
-												| functionCall 
+                        | functionCall 
 {
-	fprintf(log,"Rule instruction -> functionCall\n");
-	$$ = $1;
+  fprintf(log,"Rule instruction -> functionCall\n");
+  $$ = $1;
 }
 
-												| assignment 
+                        | assignment 
 {
-	fprintf(log,"Rule instruction ->assignment\n"); 
-	$$ = $1;
+  fprintf(log,"Rule instruction ->assignment\n"); 
+  $$ = $1;
 }
-			         
+               
             | functionDeclaration {
-				fprintf(log,"Rule instruction -> function declaration");
-			
-			}
-			;
+        fprintf(log,"Rule instruction -> function declaration");
+      
+      }
+      ;
 
 assignment : ID ASSIGN expr 
 {
-	struct parse_node * left = create_node_var ($1);
+  struct parse_node * left = create_node_var ($1);
       
-	$$ = create_node (left, $3, OP_ASSIGN);
+  $$ = create_node (left, $3, OP_ASSIGN);
 }
-									;
+                  ;
 
 declaration : TYPE ID 
 {
-	struct parse_node *left = ParseNode(); left->op = $1;
-	struct parse_node *right = ParseNode();
-	right->name = strdup($2);
-	$$ = create_node(left,right,OP_DECLARE);
+  struct parse_node *left = ParseNode(); left->op = $1;
+  struct parse_node *right = ParseNode();
+  right->name = strdup($2);
+  $$ = create_node(left,right,OP_DECLARE);
 }
-												| TYPE ID '(' expr ')'
+                        | TYPE ID '(' expr ')'
 {
-	struct parse_node *left = ParseNode(); left->op = $1;
-	struct parse_node *right = ParseNode();
-	right->name = strdup($2);
-	$$ = create_node_full(left,right,$4, OP_DECLARE);
+  struct parse_node *left = ParseNode(); left->op = $1;
+  struct parse_node *right = ParseNode();
+  right->name = strdup($2);
+  $$ = create_node_full(left,right,$4, OP_DECLARE);
 }
-												| TYPE ID '(' ')' 
+                        | TYPE ID '(' ')' 
 {
-	struct parse_node *left = ParseNode(); left->op = $1;
-	struct parse_node *right = ParseNode();
-	right->name = strdup($2);
-	$$ = create_node(left,right,OP_DECLARE);
+  struct parse_node *left = ParseNode(); left->op = $1;
+  struct parse_node *right = ParseNode();
+  right->name = strdup($2);
+  $$ = create_node(left,right,OP_DECLARE);
 }
-												| TYPE ID ASSIGN expr 
+                        | TYPE ID ASSIGN expr 
 { 
-	fprintf(log, "Rule declaration -> TYPE ID\n");
-	struct parse_node *left = ParseNode();
+  fprintf(log, "Rule declaration -> TYPE ID\n");
+  struct parse_node *left = ParseNode();
         left->op = $1;
-	struct parse_node *right = ParseNode();
-	right->name = strdup($2);
-	$$ = create_node_full(left,right, $4, OP_DECLARE);
+  struct parse_node *right = ParseNode();
+  right->name = strdup($2);
+  $$ = create_node_full(left,right, $4, OP_DECLARE);
 }
-												| AUTO ID ASSIGN expr
+                        | AUTO ID ASSIGN expr
 {
-	fprintf(log,"Rule declaration -> AUTO ID\n");
-	
-	struct parse_node *left = ParseNode(); left->op = TYPE_AUTO;
-	struct parse_node *right = ParseNode();
-	right->name = strdup($2);
-	$$ = create_node_full(left,right, $4, OP_DECLARE);
+  fprintf(log,"Rule declaration -> AUTO ID\n");
+  
+  struct parse_node *left = ParseNode(); left->op = TYPE_AUTO;
+  struct parse_node *right = ParseNode();
+  right->name = strdup($2);
+  $$ = create_node_full(left,right, $4, OP_DECLARE);
 }
-												;
+                        ;
 
 functionCall : ID '(' call_params ')' {
-	struct parse_node* left = ParseNode(); left->name = strdup($1);
-	$$ = create_node (left, $3, OP_CALL);
+  struct parse_node* left = ParseNode(); left->name = strdup($1);
+  $$ = create_node (left, $3, OP_CALL);
 }
-				;
+        ;
 
 functionDeclaration : ID '(' call_params ')' ':' assignment{
 
 }
-					| ID '(' call_params ')' ':' functionCall {
+          | ID '(' call_params ')' ':' functionCall {
 
 }
-					| ID '(' call_params ')' ':' BGN '\n' instructions END {
+          | ID '(' call_params ')' ':' BGN '\n' instructions END {
 
 }
-					;
+          ;
 
 if : IF expr ':' assignment
 {
-	$$ = create_node ($2, $4, OP_IF);
+  $$ = create_node ($2, $4, OP_IF);
 }
    | IF expr ':' functionCall
 {
-	$$ = create_node ($2, $4, OP_IF);
+  $$ = create_node ($2, $4, OP_IF);
 }
    | IF expr ':' BGN '\n' instructions END
 {
-	$$ = create_node ($2, $6, OP_IF);
+  $$ = create_node ($2, $6, OP_IF);
 }
    ;
 
 while : WHILE expr ':' assignment
 {
-	$$ = create_node ($2, $4, OP_WHILE);
+  $$ = create_node ($2, $4, OP_WHILE);
 }
-			| WHILE expr ':' functionCall
+      | WHILE expr ':' functionCall
 {
-	$$ = create_node ($2, $4, OP_WHILE);
+  $$ = create_node ($2, $4, OP_WHILE);
 }
-			| WHILE expr ':' BGN '\n' instructions END
+      | WHILE expr ':' BGN '\n' instructions END
 {
-	$$ = create_node ($2, $6, OP_WHILE);
+  $$ = create_node ($2, $6, OP_WHILE);
 }
-			;
+      ;
 
 for : FOR ID IN RANGE '(' expr ',' expr ',' expr ')' ':' assignment
 {
-	fprintf(log,"Rule for\n");
-	$$ = create_node_for_range3 ($2, $6, $8, $10, $13);
+  fprintf(log,"Rule for\n");
+  $$ = create_node_for_range3 ($2, $6, $8, $10, $13);
 }
 
     | FOR ID IN RANGE '(' expr ',' expr ')' ':' assignment
 {
-	fprintf(log,"Rule for\n");
-	$$ = create_node_for_range2 ($2, $6, $8, $11);
+  fprintf(log,"Rule for\n");
+  $$ = create_node_for_range2 ($2, $6, $8, $11);
 }
 
     | FOR ID IN RANGE '(' expr ',' expr ',' expr ')' ':' BGN '\n' instructions END
 {
-	fprintf(log,"Rule for\n");
-	$$ = create_node_for_range3 ($2, $6, $8, $10, $15);
+  fprintf(log,"Rule for\n");
+  $$ = create_node_for_range3 ($2, $6, $8, $10, $15);
 }
     | FOR ID IN RANGE '(' expr ',' expr ')' ':' BGN '\n' instructions END
 {
-	fprintf(log,"Rule for\n");
-	$$ = create_node_for_range2 ($2, $6, $8, $13);
+  fprintf(log,"Rule for\n");
+  $$ = create_node_for_range2 ($2, $6, $8, $13);
 }
-	    ;
+      ;
 
 call_params : expr
 {
-	$$ = $1;
+  $$ = $1;
 }
-												| call_params ',' expr
+                        | call_params ',' expr
 {
-	$$ = $1;
-	add_after($$, $3);
+  $$ = $1;
+  add_after($$, $3);
 }
-												;
+                        ;
 
 expr : ID
 {
@@ -256,14 +256,14 @@ expr : ID
 
  /*custom main functions and such go here*/
 int yyerror(char * s){
-	fprintf(stderr, "error: %s at line: %d\n",s,yylineno);
-	exit (1);
+  fprintf(stderr, "error: %s at line: %d\n",s,yylineno);
+  exit (1);
 }
 
 int main(int argc, char** argv){
-	log = fopen("log.txt","w");
-	yyin = fopen(argv[1],"r");
-	variables = Trie ();
-	stack[0] = Trie();
-	yyparse();
+  log = fopen("log.txt","w");
+  yyin = fopen(argv[1],"r");
+  variables = Trie ();
+  stack[0] = Trie();
+  yyparse();
 }
