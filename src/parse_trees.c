@@ -302,7 +302,7 @@ struct var_value* find_var (struct parse_node *root) {
 		llevel--;
 	}
 	if (val == NULL) {
-	 error ("Variable %s not declared", root->left->name);
+	 error ("variable %s not declared\n", root->left->name);
 	}
 	return val;
 }
