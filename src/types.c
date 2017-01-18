@@ -1,6 +1,7 @@
 #include "types.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 char SETVARS
 
@@ -16,13 +17,24 @@ struct var_value* VarValue () {
 	return x;
 }
 
-void error (const char *c) {
-	printf("%s\n", c);
+int *lineno = NULL;
+void error (const char *format, ...) {
+ va_list args;
+	va_start(args, format);
+
+	if (lineno != NULL)
+		printf ("error on line %d: ", *lineno);
+	strdup (format);
+	vprintf(format, args);
+
+	va_end(args);
+
 	exit(1);
 }
 
 void assert_cast (int type1, int type2) {
-	if (type1 / 7 != type2 / 7) {
+
+if (type1 / 7 != type2 / 7) {
 		error("Assignment of incompatible types");
 	}
 }

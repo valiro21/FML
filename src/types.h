@@ -2,6 +2,12 @@
 #define TYPES_H
 #define typeof __typeof__
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+
+extern int *lineno;
+
 typedef struct var_value {
   union
   {
@@ -163,7 +169,7 @@ const char * format_TYPE_DOUBLE;
                       TYPE_PRINT(r,TYPE_LONGLONG) \
                       TYPE_PRINT(r,TYPE_DOUBLE)
 
-extern void error (const char *);
+extern void error (const char *format, ...);
 extern void assert_cast(int type1, int type2);
 
 #endif
