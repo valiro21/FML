@@ -1,0 +1,5 @@
+string a = "asbguif"
+string b = a + a
+print(a)
+int c = a + b
+print(c)
