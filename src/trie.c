@@ -92,6 +92,7 @@ var_value* set(struct trie *t, char *name, var_value val) {
 
 	if (tp->value == NULL) return NULL;
 
+	assert_cast (tp->value->type, val.type);
 	ASSIGN_CAST((*(tp->value)), val)
 
 	return tp->value;
