@@ -34,6 +34,9 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
     yylval.value->TYPE_BOOL_VAL = 0;
     return BOOL;
 }
+"or"|"||" {return OR;}
+"and"|"&&" {return AND;}
+
 "def" {return DEF;}
 "for" {return FOR;}
 "in" {return IN;}
@@ -66,8 +69,6 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 {string} {return STRING;}
 "{" {return BGN;}
 "}" {return END;}
-"||" {return OR;}
-"&&" {return AND;}
 "!" {return NEG;}
 "=" {return ASSIGN;}
 "==" {return EQ;}
