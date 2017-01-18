@@ -169,9 +169,9 @@ functionDeclaration : DEF ID '(' define_params ')' ':' assignment
  struct parse_node* left = ParseNode(); left->name = strdup($2);
 	$$ = create_node_full(left, $4, $7, OP_DECL_FUNC);
 }
-          | DEF ID '(' define_params ')' ':' BGN '\n' instructions END {
+          | DEF ID '(' define_params ')' ':' '\n' instructions END {
  struct parse_node* left = ParseNode(); left->name = strdup($2);
-	$$ = create_node_full(left, $4, $9, OP_DECL_FUNC);
+	$$ = create_node_full(left, $4, $8, OP_DECL_FUNC);
 }
                     ;
 
@@ -183,8 +183,8 @@ stmt : expr ':' assignment {
     $$ = create_node ($1, $3, OP_IF);
 }
 
-   | expr ':' BGN '\n' instructions END {
-    $$ = create_node ($1, $5, OP_IF);
+   | expr ':' '\n' instructions END {
+    $$ = create_node ($1, $4, OP_IF);
 }
    ;
 
@@ -196,8 +196,8 @@ stmte : ':' assignment {
     $$ = create_node (NULL, $2, OP_IF);
 }
 
-   | ':' BGN '\n' instructions END {
-    $$ = create_node (NULL, $4, OP_IF);
+   | ':' '\n' instructions END {
+    $$ = create_node (NULL, $3, OP_IF);
 }
    ;
 
@@ -205,8 +205,8 @@ while : WHILE expr ':' stmt {
     $$ = create_node ($2, $4, OP_WHILE);
 }
 
-      | WHILE expr ':' BGN '\n' instructions END {
-    $$ = create_node ($2, $6, OP_WHILE);
+      | WHILE expr ':' '\n' instructions END {
+    $$ = create_node ($2, $5, OP_WHILE);
 }
       ;
 
@@ -220,14 +220,14 @@ for : FOR ID IN RANGE '(' expr ',' expr ',' expr ')' ':' assignment {
     $$ = create_node_for_range2 ($2, $6, $8, $11);
 }
 
-    | FOR ID IN RANGE '(' expr ',' expr ',' expr ')' ':' BGN '\n' instructions END {
+    | FOR ID IN RANGE '(' expr ',' expr ',' expr ')' ':' '\n' instructions END {
     fprintf(ruleLog,"Rule for\n");
-    $$ = create_node_for_range3 ($2, $6, $8, $10, $15);
+    $$ = create_node_for_range3 ($2, $6, $8, $10, $14);
 }
 
-    | FOR ID IN RANGE '(' expr ',' expr ')' ':' BGN '\n' instructions END {
+    | FOR ID IN RANGE '(' expr ',' expr ')' ':' '\n' instructions END {
     fprintf(ruleLog,"Rule for\n");
-    $$ = create_node_for_range2 ($2, $6, $8, $13);
+    $$ = create_node_for_range2 ($2, $6, $8, $12);
 }
     ;
 
