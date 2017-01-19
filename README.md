@@ -96,6 +96,16 @@ print(a)
 
 ```
 
+## How to build
+Use ```make``` to generate executable ```a.out```
+
+Use ```make tests``` to run tests for the parser
+
+After generating the executable, to compile and run a program use:
+```
+./a.out <filename>
+```
+
 ## Versioning
 We use git as versioning system and GitHub for releases, if any.
 
