@@ -34,7 +34,7 @@ spaces [ |\t]
     }
 }
 \n[ \t]*\n  {unput('\n');}
-.*:([ ]|[\t])*\n {
+:([ ]|[\t])*\n {
 	FIRST_IN_BLOCK = 1;
 	REJECT;
 }

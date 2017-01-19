@@ -1,0 +1,14 @@
+def lgpow (int base, int pw):
+ int r
+ if pw == 0:
+  r = 1
+ else:
+  int res = lgpow(base, pw/2)
+  r = res * res
+  if pw % 2 == 1:
+   r = r * base
+ r = r
+
+
+int a = lgpow (2,3)
+print(a)

@@ -55,6 +55,7 @@ void decrease_indent_level () {
 /// @param line: string representing the current line
 /// @return found indent size or -1 if there is an error
 int check_indent(char* line) {
+    if (line[0] == '}') return 0;
  unsigned int indent = get_indent(line);
 	int end_token = 0;
 
