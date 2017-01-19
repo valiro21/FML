@@ -247,6 +247,7 @@ struct var_value* op_call (struct parse_node *root) {
 	struct var_value *result;
 	if (strcmp(root->left->name, "print") == 0) {
 		result = exec_tree(root->right);
+		assert_cast(result->type, TYPE_INT);
 		PRINT ((*result));
 		return result;
 	}

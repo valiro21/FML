@@ -124,7 +124,18 @@ declaration : TYPE ID {
     right->name = strdup($2);
     $$ = create_node(left,right,OP_DECLARE);
 }
-
+            | TYPE ID '[' ']' {
+    struct parse_node *left = ParseNode(); left->op = TYPE_UNKNOWN;
+    struct parse_node *right = ParseNode();
+    right->name = strdup($2);
+    $$ = create_node(left,right, OP_DECLARE);
+}
+												| TYPE ID '[' expr ']' {
+    struct parse_node *left = ParseNode(); left->op = TYPE_UNKNOWN;
+    struct parse_node *right = ParseNode();
+    right->name = strdup($2);
+    $$ = create_node(left,right,OP_DECLARE);
+}
             | TYPE ID '(' expr ')' {
     struct parse_node *left = ParseNode(); left->op = $1;
     struct parse_node *right = ParseNode();
