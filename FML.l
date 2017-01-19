@@ -75,6 +75,7 @@ yylineno+=yyleng-1;}
 "or"|"||" {return OR;}
 "and"|"&&" {return AND;}
 "def" {return DEF;}
+"class" {return CLASS;}
 "for" {return FOR;}
 "in" {return IN;}
 "range" {return RANGE;}

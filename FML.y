@@ -34,7 +34,7 @@ struct trie *variables;
 %type <node> program instruction instructions declaration while for assignment functionCall functionDeclaration call_params expr define_params stmt stmte
 %token <value> REAL INT CHAR BOOL STRING
 
-%token BGN ASSIGN EXPR END FOR WHILE IF ELIF ELSE OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF
+%token BGN ASSIGN EXPR END FOR WHILE IF ELIF ELSE OR AND AUTO PRINT NEG IN RANGE EQ NEQ LE L GE G DEF CLASS
 %start program
 
 %nonassoc IFX
@@ -103,12 +103,14 @@ instruction : declaration {
     fprintf(ruleLog,"Rule instruction ->assignment\n"); 
     $$ = $1;
 }
-                        | functionDeclaration
-{
+            | functionDeclaration {
   fprintf(ruleLog,"Rule instruction -> function declaration");
   $$ = $1;   
 }
-
+			| classDeclaration {
+	fprintf(ruleLog,"Rule instruction -> class declaration");
+}
+			;
 assignment : ID ASSIGN expr {
     struct parse_node * left = create_node_var ($1);
     $$ = create_node (left, $3, OP_ASSIGN);
@@ -174,7 +176,17 @@ functionDeclaration : DEF ID '(' define_params ')' ':' assignment
  struct parse_node* left = ParseNode(); left->name = strdup($2);
 	$$ = create_node_full(left, $4, $8, OP_DECL_FUNC);
 }
-                    ;
+          ;
+
+classDeclaration : CLASS ID ':' '\n' classBlock END {
+}
+                 ;
+classBlock : classBlock functionDeclaration '\n' {
+}
+           | functionDeclaration '\n' {}
+		   | classBlock declaration '\n'
+		   | declaration '\n'
+		   ;
 
 stmt : expr ':' assignment {
     $$ = create_node ($1, $3, OP_IF);
