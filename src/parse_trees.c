@@ -265,8 +265,8 @@ struct var_value* op_call (struct parse_node *root) {
 	
 		stack[level+1] = Trie();
 		while (arg1 != NULL && arg2 != NULL) {
-			struct var_value *arg = exec_tree(arg1);
-			assert_cast (arg->type, arg2->left->op);		
+			struct var_value *arg = exec(arg1);
+			assert_cast (arg->type, arg2->left->op);
 		
 			create(stack[level+1], arg2->right->name, arg2->left->op);
 			set (stack[level+1],arg2->right->name, *arg);
@@ -275,7 +275,7 @@ struct var_value* op_call (struct parse_node *root) {
 			arg2 = arg2->next;
 		}
 		if (arg1 != NULL || arg2 != NULL) {
-			error ("Invalid number of arguments for function");
+			error ("invalid number of arguments for function\n");
 		}
 
 		level++;
