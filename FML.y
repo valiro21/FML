@@ -295,7 +295,7 @@ define_params : declaration{
 
 
 expr : ID                     {$$ = create_node_var($1);}
-	 | functionCall	          {$$ = $1;}
+	    | functionCall	          {$$ = $1;}
      | BOOL                   {$$ = create_node_leaf($1);}
      | REAL                   {$$ = create_node_leaf ($1);}
      | INT                    {$$ = create_node_leaf ($1);}
@@ -318,7 +318,7 @@ expr : ID                     {$$ = create_node_var($1);}
                                minus_one->TYPE_INT_VAL = -1; minus_one->type = TYPE_INT;
                                struct parse_node *p = create_node_leaf (minus_one);
                                $$ = create_node (p, $2, 3);}
-     | '(' expr ')'           {*$$ = *$2;}
+     | '(' expr ')'           {$$ = $2;}
      ;
 
  /*action definitions go here */
