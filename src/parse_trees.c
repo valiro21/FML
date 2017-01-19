@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 struct trie* stack[MAX_LEVEL];
 int level = 0;
@@ -246,9 +247,31 @@ struct parse_node* find_func (struct parse_node *root) {
 struct var_value* op_call (struct parse_node *root) {
 	struct var_value *result;
 	if (strcmp(root->left->name, "print") == 0) {
-		result = exec_tree(root->right);
+		if (root->right == NULL || root->right->next != NULL)
+		 error ("invalid number of arguments for function print\n");
+		result = exec(root->right);
 		assert_cast(result->type, TYPE_INT);
 		PRINT ((*result));
+		return result;
+	}
+	else if (strcmp (root->left->name, "pow") == 0) {
+	 if (root->right == NULL || root->right->next == NULL || root->right->next->next != NULL) {
+		 error("invalid number of arguments for function pow");
+		}
+	 struct var_value* l = exec(root->right);
+	 struct var_value* r = exec(root->right->next);
+		assert_cast(l->type, TYPE_INT);
+		assert_cast(r->type, TYPE_INT);
+		struct var_value *result = VarValue ();
+		result->type = TYPE_INT;
+		struct var_value *le = VarValue();
+		le->type = TYPE_INT;
+		struct var_value *rg = VarValue();
+		rg->type = TYPE_INT;
+
+		ASSIGN_CAST((*le), (*l));
+		ASSIGN_CAST((*rg), (*r));
+		result->TYPE_INT_VAL = pow (le->TYPE_INT_VAL, rg->TYPE_INT_VAL);
 		return result;
 	}
 	else {

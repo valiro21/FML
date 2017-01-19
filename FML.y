@@ -172,9 +172,27 @@ functionCall : ID '(' call_params ')' {
     struct parse_node* left = ParseNode(); left->name = strdup($1);
     $$ = create_node (left, $3, OP_CALL);
 }
+             | ID '(' ')' {
+    struct parse_node* left = ParseNode(); left->name = strdup($1);
+    $$ = create_node (left, NULL, OP_CALL);
+}
              ;
 
-functionDeclaration : DEF ID '(' define_params ')' ':' assignment
+functionDeclaration : DEF ID '(' ')' ':' assignment
+{
+ struct parse_node* left = ParseNode(); left->name = strdup($2);
+	$$ = create_node_full(left, NULL, $6, OP_DECL_FUNC);
+}
+          | DEF ID '(' ')' ':' functionCall
+{
+ struct parse_node* left = ParseNode(); left->name = strdup($2);
+	$$ = create_node_full(left, NULL, $6, OP_DECL_FUNC);
+}
+          | DEF ID '(' ')' ':' '\n' instructions END {
+ struct parse_node* left = ParseNode(); left->name = strdup($2);
+	$$ = create_node_full(left, NULL, $7, OP_DECL_FUNC);
+}
+          | DEF ID '(' define_params ')' ':' assignment
 {
  struct parse_node* left = ParseNode(); left->name = strdup($2);
 	$$ = create_node_full(left, $4, $7, OP_DECL_FUNC);
