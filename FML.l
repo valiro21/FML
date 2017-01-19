@@ -19,13 +19,12 @@ identifier [_a-zA-Z][_a-zA-Z0-9]*
 ENDL \n
 spaces [ |\t]
 %%
-[ \t]+\n  {yylineno++;}
 <<EOF>>   {if (!once_eof) {once_eof = 1;unput('\n');unput (0);}}
 (.*\n) {
     if (skip_next > 0) {
         REJECT;
     }
-    
+    yylineno++;
     int end_tokens = check_indent (yytext);
     for (int i = yyleng - 1; i >= 0; i--)
         unput(yytext[i]);
@@ -34,13 +33,7 @@ spaces [ |\t]
         unput('}');
     }
 }
-\n\n+ {
-int end_tokens = check_indent ("");
-for(int i = 0; i < end_tokens; i++) {
-        unput('}');
-}
-unput('\n');
-yylineno+=yyleng-1;}
+\n[ \t]*\n  {unput('\n');}
 .*:([ ]|[\t])*\n {
 	FIRST_IN_BLOCK = 1;
 	REJECT;
@@ -50,7 +43,6 @@ yylineno+=yyleng-1;}
     if (skip_next == 1) {
         skip_next--;
     }
-    yylineno++;
     return yytext[0];
 }
 "int" {yylval.type = TYPE_INT; return TYPE;}

@@ -48,7 +48,8 @@ program : instructions {
 }
         ;
 
-instructions : instruction '\n' {
+instructions : '\n' '\n' {;}
+             | instruction '\n' {
     fprintf(ruleLog,"Rule instructions -> instruction\n");
     $$ = $1;
 }

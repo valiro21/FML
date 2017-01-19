@@ -1,3 +1,6 @@
 class test :
-	int x
-	def afisare(int x) : print(x)
+	def p(int x):
+	 x = a
+
+
+
