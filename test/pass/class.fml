@@ -1,0 +1,3 @@
+class test :
+	int x
+	def afisare(int x) : print(x)
