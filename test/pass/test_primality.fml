@@ -20,7 +20,12 @@ for i in range (2,101,1):
   print (c)
 
 int j = 2
-j = j + 1 + 2 * (x + f(2))
+int x
+if j > 2 or x + 2 < 5 and (x > 7 + j):
+ x = x
+
+print (j)
+print (2)
 
 
 

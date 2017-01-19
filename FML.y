@@ -110,6 +110,8 @@ instruction : declaration {
 }
 			| classDeclaration {
 	fprintf(ruleLog,"Rule instruction -> class declaration");
+  $$ = ParseNode ();
+  $$->value = VarValue ();
 }
 			;
 assignment : ID ASSIGN expr {
